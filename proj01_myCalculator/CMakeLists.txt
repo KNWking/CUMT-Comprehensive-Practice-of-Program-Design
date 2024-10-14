@@ -14,7 +14,9 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(proj01_myCalculator main.cpp)
+add_executable(proj01_myCalculator main.cpp
+        calculator.h
+        calculator.cpp)
 target_link_libraries(proj01_myCalculator
         Qt::Core
         Qt::Gui
