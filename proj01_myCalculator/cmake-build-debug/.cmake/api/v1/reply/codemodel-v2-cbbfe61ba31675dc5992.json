@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "proj01_myCalculator",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "proj01_myCalculator::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-proj01_myCalculator-Debug-eae52759bdb552ea73b1.json",
+					"name" : "proj01_myCalculator",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "proj01_myCalculator_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-proj01_myCalculator_autogen-Debug-021990ba762881b4142c.json",
+					"name" : "proj01_myCalculator_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "proj01_myCalculator_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-proj01_myCalculator_autogen_timestamp_deps-Debug-5c87055d0e1ffbecebac.json",
+					"name" : "proj01_myCalculator_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/Backup/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator/cmake-build-debug",
+		"source" : "D:/Backup/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

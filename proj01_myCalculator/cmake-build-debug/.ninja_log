@@ -1,0 +1,8 @@
+# ninja log v5
+7	100	7505752741003586	proj01_myCalculator_autogen/timestamp	ca3d2d59bb21f790
+7	100	7505752741003586	proj01_myCalculator_autogen/mocs_compilation.cpp	ca3d2d59bb21f790
+7	100	7505752741003586	D:/Backup/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator/cmake-build-debug/proj01_myCalculator_autogen/timestamp	ca3d2d59bb21f790
+7	100	7505752741003586	D:/Backup/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator/cmake-build-debug/proj01_myCalculator_autogen/mocs_compilation.cpp	ca3d2d59bb21f790
+102	132	7505752741571645	CMakeFiles/proj01_myCalculator.dir/proj01_myCalculator_autogen/mocs_compilation.cpp.obj	a35e536396c5a8a6
+104	1447	7505752754716946	CMakeFiles/proj01_myCalculator.dir/main.cpp.obj	939a970092d18aee
+1449	1652	7505752755697230	proj01_myCalculator.exe	1784f6ba73d592dd
