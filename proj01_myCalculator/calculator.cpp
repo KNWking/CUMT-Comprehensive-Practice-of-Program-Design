@@ -22,57 +22,41 @@ Calculator::Calculator(QWidget *parent)
 Calculator::~Calculator() {}
 
 void Calculator::createButtons() {
-    QString buttonLabels[5][4] = {
-            {"清空", "退格", "",  ""},
-            {"7",    "8",    "9", "-"},
-            {"4",    "5",    "6", "+"},
-            {"1",    "2",    "3", "×"},
-            {"0",    ".",    "÷", "="}
-    };
-    const char *buttonSlots[5][4] = {
-            {SLOT(on_op_AC_clicked()), SLOT(on_op_del_clicked()), nullptr, nullptr},
-            {SLOT(on_digit_clicked()), SLOT(on_digit_clicked()),  SLOT(on_digit_clicked()),  SLOT(on_op_sub_clicked())},
-            {SLOT(on_digit_clicked()), SLOT(on_digit_clicked()),  SLOT(on_digit_clicked()),  SLOT(on_op_add_clicked())},
-            {SLOT(on_digit_clicked()), SLOT(on_digit_clicked()),  SLOT(on_digit_clicked()),  SLOT(on_op_mul_clicked())},
-            {SLOT(on_digit_clicked()), SLOT(on_op_pnt_clicked()), SLOT(on_op_dvd_clicked()), SLOT(on_op_eqa_clicked())}
-    };
+    // 清空和退格按钮
+    createButton("清空", SLOT(on_op_AC_clicked()), 0, 0, 1, 1);
+    createButton("退格", SLOT(on_op_del_clicked()), 0, 1, 1, 2);
 
-    QString opLabels[4][1] = {
-            {"sqrt"},
-            {"%"},
-            {"1/x"},
-            {""}
-    };
-    const char *opSlots[4][1] = {
-            {SLOT(on_op_sqrt_clicked())},
-            {SLOT(on_op_percent_clicked())},
-            {SLOT(on_op_reciprocal_clicked())},
-            {nullptr}
-    };
+    // 数字按钮和 '.' 按钮
+    createButton("7", SLOT(on_digit_clicked()), 1, 0);
+    createButton("8", SLOT(on_digit_clicked()), 1, 1);
+    createButton("9", SLOT(on_digit_clicked()), 1, 2);
+    createButton("-", SLOT(on_op_sub_clicked()), 1, 3);
+    createButton("sqrt", SLOT(on_op_sqrt_clicked()), 1, 4);
 
-    for (int i = 0; i < 5; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            if (!buttonLabels[i][j].isEmpty() && buttonSlots[i][j] != nullptr) {
-                QPushButton *button = createButton(buttonLabels[i][j], buttonSlots[i][j]);
-                mainLayout->addWidget(button, i, j);
-            }
-        }
-    }
+    createButton("4", SLOT(on_digit_clicked()), 2, 0);
+    createButton("5", SLOT(on_digit_clicked()), 2, 1);
+    createButton("6", SLOT(on_digit_clicked()), 2, 2);
+    createButton("+", SLOT(on_op_add_clicked()), 2, 3);
+    createButton("%", SLOT(on_op_percent_clicked()), 2, 4);
 
-    for (int i = 1; i <= 3; ++i) {
-        for (int j = 3; j < 4; ++j) {
-            if (!opLabels[i - 1][0].isEmpty() && opSlots[i - 1][0] != nullptr) {
-                QPushButton *button = createButton(opLabels[i - 1][0], opSlots[i - 1][0]);
-                mainLayout->addWidget(button, i, j);
-            }
-        }
-    }
+    createButton("1", SLOT(on_digit_clicked()), 3, 0);
+    createButton("2", SLOT(on_digit_clicked()), 3, 1);
+    createButton("3", SLOT(on_digit_clicked()), 3, 2);
+    createButton("×", SLOT(on_op_mul_clicked()), 3, 3);
+    createButton("1/x", SLOT(on_op_reciprocal_clicked()), 3, 4);
+
+    createButton("0", SLOT(on_digit_clicked()), 4, 0, 1, 2);
+    createButton(".", SLOT(on_op_pnt_clicked()), 4, 2);
+    createButton("÷", SLOT(on_op_div_clicked()), 4, 3);
+    createButton("=", SLOT(on_op_eqa_clicked()), 4, 4);
 }
 
-QPushButton *Calculator::createButton(const QString &text, const char *member) {
+QPushButton *
+Calculator::createButton(const QString &text, const char *member, int row, int col, int rowspan, int colspan) {
     QPushButton *button = new QPushButton(text);
     button->setFixedSize(60, 60);
     connect(button, SIGNAL(clicked()), this, member);
+    mainLayout->addWidget(button, row, col, rowspan, colspan);
     return button;
 }
 
@@ -89,7 +73,7 @@ void Calculator::on_op_sub_clicked() { display->insert("-"); }
 
 void Calculator::on_op_mul_clicked() { display->insert("*"); }
 
-void Calculator::on_op_dvd_clicked() { display->insert("/"); }
+void Calculator::on_op_div_clicked() { display->insert("/"); }
 
 void Calculator::on_op_eqa_clicked() { processCalculation(); }
 
@@ -106,7 +90,7 @@ void Calculator::on_op_del_clicked() {
 void Calculator::on_op_sqrt_clicked() {
     QString text = display->text();
     double value = text.toDouble();
-    display->setText(QString::number(sqrt(value)));
+    display->setText(QString::number(std::sqrt(value)));
 }
 
 void Calculator::on_op_percent_clicked() {
@@ -218,16 +202,4 @@ void Calculator::processCalculation() {
     if (!values.empty()) {
         display->setText(QString::number(values.top()));
     }
-}
-
-double Calculator::sqrt(double x) {
-    return std::sqrt(x);
-}
-
-double Calculator::percent(double x) {
-    return x / 100;
-}
-
-double Calculator::reciprocal(double x) {
-    return x != 0 ? 1 / x : 0;
 }

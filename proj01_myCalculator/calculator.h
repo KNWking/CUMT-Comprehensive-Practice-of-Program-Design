@@ -25,7 +25,7 @@ private slots:
 
     void on_op_mul_clicked();
 
-    void on_op_dvd_clicked();
+    void on_op_div_clicked();
 
     void on_op_eqa_clicked();
 
@@ -48,18 +48,13 @@ private:
 
     void processCalculation();
 
-    double sqrt(double x);
-
-    double percent(double x);
-
-    double reciprocal(double x);
-
     QLineEdit *display;
     QGridLayout *mainLayout;
 
     void createButtons();
 
-    QPushButton *createButton(const QString &text, const char *member);
+    QPushButton *
+    createButton(const QString &text, const char *member, int row, int col, int rowspan = 1, int colspan = 1);
 };
 
 #endif // CALCULATOR_H

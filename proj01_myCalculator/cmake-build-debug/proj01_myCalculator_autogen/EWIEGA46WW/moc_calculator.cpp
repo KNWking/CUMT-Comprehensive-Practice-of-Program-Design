@@ -42,7 +42,7 @@ constexpr auto qt_meta_stringdata_CLASSCalculatorENDCLASS = QtMocHelpers::string
     "on_op_add_clicked",
     "on_op_sub_clicked",
     "on_op_mul_clicked",
-    "on_op_dvd_clicked",
+    "on_op_div_clicked",
     "on_op_eqa_clicked",
     "on_op_AC_clicked",
     "on_op_pnt_clicked",
@@ -117,7 +117,7 @@ Q_CONSTINIT const QMetaObject Calculator::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_op_mul_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'on_op_dvd_clicked'
+        // method 'on_op_div_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_op_eqa_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
@@ -147,7 +147,7 @@ void Calculator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 1: _t->on_op_add_clicked(); break;
         case 2: _t->on_op_sub_clicked(); break;
         case 3: _t->on_op_mul_clicked(); break;
-        case 4: _t->on_op_dvd_clicked(); break;
+        case 4: _t->on_op_div_clicked(); break;
         case 5: _t->on_op_eqa_clicked(); break;
         case 6: _t->on_op_AC_clicked(); break;
         case 7: _t->on_op_pnt_clicked(); break;
