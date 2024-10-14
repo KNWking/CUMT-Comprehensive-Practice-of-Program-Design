@@ -33,11 +33,13 @@ private slots:
 
     void on_op_pnt_clicked();
 
-    void on_op_lf_clicked();
-
-    void on_op_rt_clicked();
-
     void on_op_del_clicked();
+
+    void on_op_sqrt_clicked();
+
+    void on_op_percent_clicked();
+
+    void on_op_reciprocal_clicked();
 
 private:
     int priority(char op);
@@ -46,7 +48,12 @@ private:
 
     void processCalculation();
 
-    QString currentExpression;
+    double sqrt(double x);
+
+    double percent(double x);
+
+    double reciprocal(double x);
+
     QLineEdit *display;
     QGridLayout *mainLayout;
 
