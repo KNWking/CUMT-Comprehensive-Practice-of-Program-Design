@@ -21,18 +21,38 @@ Calculator::Calculator(QWidget *parent)
 Calculator::~Calculator() {}
 
 void Calculator::createButtons() {
-    QString buttons[4][4] = {
-            {"7", "8", "9", "+"},
-            {"4", "5", "6", "-"},
-            {"1", "2", "3", "*"},
-            {"0", "C", "=", "/"}
+    // 数字按钮
+    QString digitButtons[4][3] = {
+            {"7", "8", "9"},
+            {"4", "5", "6"},
+            {"1", "2", "3"},
+            {"0", ".", "C"}
     };
 
     for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            QPushButton *button = createButton(buttons[i][j], SLOT(on_digit_clicked()));
+        for (int j = 0; j < 3; ++j) {
+            QPushButton *button = createButton(digitButtons[i][j], SLOT(on_digit_clicked()));
             mainLayout->addWidget(button, i, j);
         }
+    }
+
+    // 操作符按钮
+    struct OpButtonInfo {
+        QString text;
+        const char *slot;
+    };
+
+    OpButtonInfo opButtons[5][1] = {
+            {"+", SLOT(on_op_add_clicked())},
+            {"-", SLOT(on_op_sub_clicked())},
+            {"*", SLOT(on_op_mul_clicked())},
+            {"/", SLOT(on_op_dvd_clicked())},
+            {"=", SLOT(on_op_eqa_clicked())}
+    };
+
+    for (int i = 0; i < 5; ++i) {
+        QPushButton *button = createButton(opButtons[i][0].text, opButtons[i][0].slot);
+        mainLayout->addWidget(button, i, 3);
     }
 }
 
@@ -89,18 +109,26 @@ int Calculator::priority(char op) {
     }
 }
 
-double Calculator::calculate(double op1, char op, double op2) {
+bool Calculator::calculate(double op1, char op, double op2, double &result) {
     switch (op) {
         case '+':
-            return op1 + op2;
+            result = op1 + op2;
+            return true;
         case '-':
-            return op1 - op2;
+            result = op1 - op2;
+            return true;
         case '*':
-            return op1 * op2;
+            result = op1 * op2;
+            return true;
         case '/':
-            return op2 != 0 ? op1 / op2 : 0; // 简单处理除零错误
+            if (op2 != 0) {
+                result = op1 / op2;
+                return true;
+            } else {
+                return false; // 处理除以0的情况
+            }
         default:
-            return 0;
+            return false;
     }
 }
 
@@ -128,7 +156,12 @@ void Calculator::processCalculation() {
                 values.pop();
                 char op = ops.top();
                 ops.pop();
-                values.push(calculate(op1, op, op2));
+                double result;
+                if (!calculate(op1, op, op2, result)) {
+                    display->setText("Error");
+                    return;
+                }
+                values.push(result);
             }
             ops.push(ch.toLatin1());
         }
@@ -138,6 +171,7 @@ void Calculator::processCalculation() {
         values.push(temp.toDouble());
     }
 
+    // 除数为 0 的错误处理。
     while (!ops.empty()) {
         double op2 = values.top();
         values.pop();
@@ -145,7 +179,12 @@ void Calculator::processCalculation() {
         values.pop();
         char op = ops.top();
         ops.pop();
-        values.push(calculate(op1, op, op2));
+        double result;
+        if (!calculate(op1, op, op2, result)) {
+            display->setText("The divisor cannot be zero.");
+            return;
+        }
+        values.push(result);
     }
 
     if (!values.empty()) {

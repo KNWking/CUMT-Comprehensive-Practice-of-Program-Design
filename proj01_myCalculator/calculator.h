@@ -42,7 +42,7 @@ private slots:
 private:
     int priority(char op);
 
-    double calculate(double op1, char op, double op2);
+    bool calculate(double op1, char op, double op2, double &result);
 
     void processCalculation();
 
