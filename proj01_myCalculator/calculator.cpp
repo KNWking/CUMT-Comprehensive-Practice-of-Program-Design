@@ -1,68 +1,105 @@
 #include "calculator.h"
-#include "ui_calculator.h"
 
 Calculator::Calculator(QWidget *parent)
-        : QWidget(parent), display(new QLineEdit(this)), layout(new QGridLayout(this)) {
-    createButtons(); // 初始化按钮
-    connectSignalsToSlots(); // 连接信号与槽
+        : QMainWindow(parent), display(new QLineEdit(this)), mainLayout(new QGridLayout) {
+    QWidget *centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
 
-    // 设置默认布局
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(display);
-    mainLayout->addLayout(layout);
-    setLayout(mainLayout);
+    display->setReadOnly(true);
+    display->setAlignment(Qt::AlignRight);
+    display->setFixedHeight(35);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(display);
+    layout->addLayout(mainLayout);
+
+    centralWidget->setLayout(layout);
+
+    createButtons();
 }
 
-Calculator::~Calculator() {
-    delete ui; // 清理 UI 对象
-}
+Calculator::~Calculator() {}
 
 void Calculator::createButtons() {
-    QStringList buttons = {
-            "清空", "÷", "×", "退格",
-            "7", "8", "9", "-",
-            "4", "5", "6", "+",
-            "1", "2", "3", "=",
-            "0"
+    // 数字按钮和操作符按钮的初始化及布局
+    QString buttons[4][4] = {
+            {"7", "8", "9", "+"},
+            {"4", "5", "6", "-"},
+            {"1", "2", "3", "*"},
+            {"0", "C", "=", "/"}
     };
 
-    int row = 1, col = 0;
-    for (const QString &buttonText: buttons) {
-        if (col == 4) {
-            col = 0;
-            row++;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            QPushButton *button = createButton(buttons[i][j], SLOT(digitClicked()));
+            mainLayout->addWidget(button, i, j);
         }
-        QPushButton *button = createButton(buttonText, SLOT(buttonClicked()));
-        layout->addWidget(button, row, col++);
     }
 }
 
 QPushButton *Calculator::createButton(const QString &text, const char *member) {
     QPushButton *button = new QPushButton(text);
+    button->setFixedSize(40, 40);
     connect(button, SIGNAL(clicked()), this, member);
     return button;
 }
 
-void Calculator::connectSignalsToSlots() {
-    // 连接按钮信号到槽
+void Calculator::on_num0_clicked() { display->insert("0"); }
+
+void Calculator::on_num1_clicked() { display->insert("1"); }
+
+void Calculator::on_num2_clicked() { display->insert("2"); }
+
+void Calculator::on_num3_clicked() { display->insert("3"); }
+
+void Calculator::on_num4_clicked() { display->insert("4"); }
+
+void Calculator::on_num5_clicked() { display->insert("5"); }
+
+void Calculator::on_num6_clicked() { display->insert("6"); }
+
+void Calculator::on_num7_clicked() { display->insert("7"); }
+
+void Calculator::on_num8_clicked() { display->insert("8"); }
+
+void Calculator::on_num9_clicked() { display->insert("9"); }
+
+void Calculator::on_op_add_clicked() { display->insert("+"); }
+
+void Calculator::on_op_sub_clicked() { display->insert("-"); }
+
+void Calculator::on_op_mul_clicked() { display->insert("*"); }
+
+void Calculator::on_op_dvd_clicked() { display->insert("/"); }
+
+void Calculator::on_op_eqa_clicked() {
+    // 处理等于按钮点击事件实现
 }
 
-void Calculator::digitClicked() {
-    // 数字按钮被点击后的处理逻辑
+void Calculator::on_op_AC_clicked() { display->clear(); }
+
+void Calculator::on_op_pnt_clicked() { display->insert("."); }
+
+void Calculator::on_op_lf_clicked() { display->insert("("); }
+
+void Calculator::on_op_rt_clicked() { display->insert(")"); }
+
+void Calculator::on_op_del_clicked() {
+    QString text = display->text();
+    text.chop(1);
+    display->setText(text);
 }
 
-void Calculator::operatorClicked() {
-    // 操作符按钮被点击后的处理逻辑
+int Calculator::priority(int state, char a) {
+    // 实现表达式优先级
+    return 0;
 }
 
-void Calculator::clearClicked() {
-    // 清除按钮被点击后的处理逻辑
+double Calculator::calculate(char op, double op1, double op2) {
+    // 实现计算逻辑
+    return 0.0;
 }
 
-void Calculator::backspaceClicked() {
-    // 退格按钮被点击后的处理逻辑
-}
-
-void Calculator::equalClicked() {
-    // 等号按钮被点击后的处理逻辑
+void Calculator::processCalculation(QString &expression) {
+    // 实现表达式处理
 }
