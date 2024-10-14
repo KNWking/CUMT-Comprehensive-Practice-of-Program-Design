@@ -6,5 +6,5 @@ int main(int argc, char *argv[]) {
     Calculator calculator;
     calculator.setWindowTitle("MyCalculator");
     calculator.show();
-    return app.exec();
+    return QApplication::exec();
 }

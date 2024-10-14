@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QGridLayout>
 #include <QPushButton>
+#include <stack>
 
 class Calculator : public QMainWindow {
 Q_OBJECT
@@ -16,28 +17,8 @@ public:
 
 private slots:
 
-    // 数字按钮槽函数
-    void on_num0_clicked();
+    void on_digit_clicked();
 
-    void on_num1_clicked();
-
-    void on_num2_clicked();
-
-    void on_num3_clicked();
-
-    void on_num4_clicked();
-
-    void on_num5_clicked();
-
-    void on_num6_clicked();
-
-    void on_num7_clicked();
-
-    void on_num8_clicked();
-
-    void on_num9_clicked();
-
-    // 操作按钮槽函数
     void on_op_add_clicked();
 
     void on_op_sub_clicked();
@@ -59,20 +40,16 @@ private slots:
     void on_op_del_clicked();
 
 private:
-    // 辅助功能函数
-    int priority(int state, char a);
+    int priority(char op);
 
-    double calculate(char op, double op1, double op2);
+    double calculate(double op1, char op, double op2);
 
-    void processCalculation(QString &expression);
+    void processCalculation();
 
-    QString currentExpression; // 当前表达式
-
-    // UI 元素
+    QString currentExpression;
     QLineEdit *display;
     QGridLayout *mainLayout;
 
-    // 辅助函数
     void createButtons();
 
     QPushButton *createButton(const QString &text, const char *member);
