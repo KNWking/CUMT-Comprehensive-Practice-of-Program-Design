@@ -14,6 +14,8 @@ class Calculator : public QWidget {
 public:
     // 构造函数
     explicit Calculator(QWidget *parent = nullptr);
+    // 析构函数
+    ~Calculator();
 
 private slots:
     // 数字按钮的槽函数

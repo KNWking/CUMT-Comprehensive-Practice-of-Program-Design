@@ -1,10 +1,12 @@
 #include <QApplication>
-#include <QPushButton>
+#include "calculator.h"
 
-int main(int argc, char *argv[]) {
-    QApplication a(argc, argv);
-    QPushButton button("Hello world!", nullptr);
-    button.resize(200, 100);
-    button.show();
-    return QApplication::exec();
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);     // 创建应用程序对象
+    Calculator calculator;            // 创建 Calculator 对象
+    calculator.setWindowTitle("MyCalculator");  // 设置窗口标题
+    calculator.show();                // 显示主窗口
+
+    return app.exec();    // 运行应用程序事件循环
 }

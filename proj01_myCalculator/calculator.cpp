@@ -1,4 +1,5 @@
 #include "calculator.h"
+#include "ui_calculator.h"
 
 Calculator::Calculator(QWidget *parent)
         : QWidget(parent), display(new QLineEdit(this)), layout(new QGridLayout(this)) {
@@ -12,7 +13,9 @@ Calculator::Calculator(QWidget *parent)
     setLayout(mainLayout);
 }
 
-Calculator::~Calculator() {}
+Calculator::~Calculator() {
+    delete ui; // 清理 UI 对象
+}
 
 void Calculator::createButtons() {
     QStringList buttons = {
@@ -24,7 +27,7 @@ void Calculator::createButtons() {
     };
 
     int row = 1, col = 0;
-    for (const QString &buttonText : buttons) {
+    for (const QString &buttonText: buttons) {
         if (col == 4) {
             col = 0;
             row++;
@@ -34,7 +37,7 @@ void Calculator::createButtons() {
     }
 }
 
-QPushButton* Calculator::createButton(const QString &text, const char *member) {
+QPushButton *Calculator::createButton(const QString &text, const char *member) {
     QPushButton *button = new QPushButton(text);
     connect(button, SIGNAL(clicked()), this, member);
     return button;
