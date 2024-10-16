@@ -1,0 +1,5 @@
+D:/OneDrive/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator/cmake-build-debug-mingw_qt/CMakeFiles/proj01_myCalculator.dir
+D:/OneDrive/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator/cmake-build-debug-mingw_qt/CMakeFiles/edit_cache.dir
+D:/OneDrive/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator/cmake-build-debug-mingw_qt/CMakeFiles/rebuild_cache.dir
+D:/OneDrive/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator/cmake-build-debug-mingw_qt/CMakeFiles/proj01_myCalculator_autogen_timestamp_deps.dir
+D:/OneDrive/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator/cmake-build-debug-mingw_qt/CMakeFiles/proj01_myCalculator_autogen.dir
