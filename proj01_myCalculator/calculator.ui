@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>Calculator</class>
+ <widget class="QMainWindow" name="Calculator">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -365,7 +365,7 @@
      <string>清空</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="backspace">
+   <widget class="QPushButton" name="op_del">
     <property name="geometry">
      <rect>
       <x>80</x>
@@ -515,7 +515,7 @@
      <string>÷</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="dot">
+   <widget class="QPushButton" name="op_dot">
     <property name="geometry">
      <rect>
       <x>140</x>
@@ -636,17 +636,6 @@
     </property>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>274</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

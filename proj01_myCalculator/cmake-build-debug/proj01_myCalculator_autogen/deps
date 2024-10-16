@@ -122,7 +122,6 @@ proj01_myCalculator_autogen/timestamp: \
 	D:/Qt/6.8.0/mingw_64/include/QtCore/qtversionchecks.h \
 	D:/Qt/6.8.0/mingw_64/include/QtCore/qtypeinfo.h \
 	D:/Qt/6.8.0/mingw_64/include/QtCore/qtypes.h \
-	D:/Qt/6.8.0/mingw_64/include/QtCore/qurl.h \
 	D:/Qt/6.8.0/mingw_64/include/QtCore/qutf8stringview.h \
 	D:/Qt/6.8.0/mingw_64/include/QtCore/qvariant.h \
 	D:/Qt/6.8.0/mingw_64/include/QtCore/qvarlengtharray.h \
@@ -142,36 +141,22 @@ proj01_myCalculator_autogen/timestamp: \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qkeysequence.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qpaintdevice.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qpalette.h \
-	D:/Qt/6.8.0/mingw_64/include/QtGui/qpen.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qpixelformat.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qpixmap.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qpolygon.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qregion.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qrgb.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qrgba64.h \
-	D:/Qt/6.8.0/mingw_64/include/QtGui/qtextcursor.h \
-	D:/Qt/6.8.0/mingw_64/include/QtGui/qtextdocument.h \
-	D:/Qt/6.8.0/mingw_64/include/QtGui/qtextformat.h \
-	D:/Qt/6.8.0/mingw_64/include/QtGui/qtextoption.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qtgui-config.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qtguiexports.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qtguiglobal.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qtransform.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qwindowdefs.h \
 	D:/Qt/6.8.0/mingw_64/include/QtGui/qwindowdefs_win.h \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/QGridLayout \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/QLineEdit \
+	D:/Qt/6.8.0/mingw_64/include/QtWidgets/QDialog \
 	D:/Qt/6.8.0/mingw_64/include/QtWidgets/QMainWindow \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/QPushButton \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qabstractbutton.h \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qboxlayout.h \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qframe.h \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qgridlayout.h \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qlayout.h \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qlayoutitem.h \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qlineedit.h \
+	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qdialog.h \
 	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qmainwindow.h \
-	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qpushbutton.h \
 	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qsizepolicy.h \
 	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qtabwidget.h \
 	D:/Qt/6.8.0/mingw_64/include/QtWidgets/qtwidgets-config.h \
@@ -564,4 +549,5 @@ proj01_myCalculator_autogen/timestamp: \
 	D:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/time.h \
 	D:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/vadefs.h \
 	D:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h \
+	D:/Backup/Documents/GitHub/CUMT-Comprehensive-Practice-of-Program-Design/proj01_myCalculator/calculator.ui \
 	D:/Qt/Tools/CMake_64/bin/cmake.exe
