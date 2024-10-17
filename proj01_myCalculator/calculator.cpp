@@ -200,7 +200,7 @@ double Calculator::calculate(char op, double op1, double op2) {
             break;
         case '/':
             // 处理除数为 0 的情况。
-            if (op2 - 0 < eps) {
+            if (abs(op2 - 0) < eps) {
                 throw std::runtime_error("错误：除数不能为 0");
             }
             result = op1 / op2;
