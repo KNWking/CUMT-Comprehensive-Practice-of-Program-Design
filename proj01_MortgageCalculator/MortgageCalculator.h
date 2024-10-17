@@ -1,8 +1,38 @@
-//
-// Created by KNWking on 2024/10/17.
-//
+#ifndef MORTGAGECALCULATOR_H
+#define MORTGAGECALCULATOR_H
 
-#ifndef PROJ01_MORTGAGECALCULATOR_MORTGAGECALCULATOR_H
-#define PROJ01_MORTGAGECALCULATOR_MORTGAGECALCULATOR_H
+#include <QMainWindow>
+#include <QRadioButton>
+#include <cmath>
+#include <cstring>
 
-#endif //PROJ01_MORTGAGECALCULATOR_MORTGAGECALCULATOR_H
+class MortgageCalculator {
+public:
+    enum RepaymentType {
+        EqualPayment, EqualPrincipal
+    };
+
+    MortgageCalculator();
+
+    void setLoanTerm(int years);
+
+    void setLoanAmount(double amount);
+
+    void setInterestRate(double rate);
+
+    void setRepaymentType(RepaymentType type);
+
+    double calculateMonthlyPayment();
+
+    double calculateTotalInterest();
+
+    double calculateTotalPayment();
+
+private:
+    int loanTerm;
+    double loanAmount;
+    double interestRate;
+    RepaymentType repaymentType;
+};
+
+#endif // MORTGAGECALCULATOR_H
