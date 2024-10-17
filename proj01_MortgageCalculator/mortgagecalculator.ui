@@ -209,7 +209,7 @@
      </font>
     </property>
     <property name="text">
-     <string>重新计算</string>
+     <string>清空</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="loanTerm">

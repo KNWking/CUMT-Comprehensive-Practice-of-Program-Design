@@ -137,7 +137,7 @@ public:
         label_6->setText(QCoreApplication::translate("MortgageCalculator", "\345\210\251\346\201\257\346\200\273\351\242\235 (\345\205\203)\357\274\232", nullptr));
         label_7->setText(QCoreApplication::translate("MortgageCalculator", "\350\277\230\346\254\276\346\200\273\351\242\235 (\345\205\203)\357\274\232", nullptr));
         calculate->setText(QCoreApplication::translate("MortgageCalculator", "\350\256\241  \347\256\227", nullptr));
-        reset->setText(QCoreApplication::translate("MortgageCalculator", "\351\207\215\346\226\260\350\256\241\347\256\227", nullptr));
+        reset->setText(QCoreApplication::translate("MortgageCalculator", "\346\270\205\347\251\272", nullptr));
     } // retranslateUi
 
 };

@@ -2,37 +2,60 @@
 #define MORTGAGECALCULATOR_H
 
 #include <QMainWindow>
-#include <QRadioButton>
+#include <QMessageBox>
 #include <cmath>
 #include <cstring>
 
-class MortgageCalculator {
+QT_BEGIN_NAMESPACE
+namespace Ui {
+    class MortgageCalculator;
+}
+QT_END_NAMESPACE
+
+class MortgageCalculator : public QMainWindow {
+Q_OBJECT
+
 public:
-    enum RepaymentType {
-        EqualPayment, EqualPrincipal
-    };
+    MortgageCalculator(QWidget *parent = nullptr);
 
-    MortgageCalculator();
+    ~MortgageCalculator();
 
-    void setLoanTerm(int years);
+private slots:
+
+    void on_calculate_clicked();
+
+    void on_reset_clicked();
+
+private:
+    Ui::MortgageCalculator *ui;
+
+    double loanTerm;
+    double loanAmount;
+    double interestRate;
+
+    int repaymentType;
+
+    double monthlyPayment;
+    double totalInterest;
+    double totalPayment;
+
+    void setLoanTerm(double years);
 
     void setLoanAmount(double amount);
 
     void setInterestRate(double rate);
 
-    void setRepaymentType(RepaymentType type);
+    void setRepaymentType(int type);
 
-    double calculateMonthlyPayment();
+    void calculateEqualPayment();
 
-    double calculateTotalInterest();
+    void calculateEqualPrincipal();
 
-    double calculateTotalPayment();
+    void displayResults(double monthlyPayment, double totalInterest, double totalPayment);
 
-private:
-    int loanTerm;
-    double loanAmount;
-    double interestRate;
-    RepaymentType repaymentType;
+    void resetFields();
+
+    bool validateInputs() const;
 };
 
 #endif // MORTGAGECALCULATOR_H
