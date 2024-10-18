@@ -2,11 +2,11 @@
 #define CALCULATOR_H
 
 #include <QMainWindow>
-#include <QDialog>
 #include <stack>
 #include <cmath>
-#include <iostream>
+#include <QString>
 #include <string>
+#include <iostream>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -67,7 +67,7 @@ private slots:
 
 private:
     // 界面对象和核心功能对象
-    Ui::Calculator *ui = nullptr;
+    Ui::Calculator *ui;
 
     int priority(int state, char a);
 
