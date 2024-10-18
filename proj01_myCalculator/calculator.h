@@ -73,9 +73,9 @@ private:
 
     double calculate(char op, double op1, double op2);
 
-    void processCalculation(QString &tmp);
+    void processCalculation(QString &rowFormula);
 
-    QString tmp = "";
+    QString rowFormula = "";
 };
 
 #endif // CALCULATOR_H

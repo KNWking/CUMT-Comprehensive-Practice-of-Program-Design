@@ -1,5 +1,6 @@
 #include "calculator.h"
 #include "ui_calculator.h"
+#include <iostream>
 
 using namespace std;
 
@@ -8,7 +9,7 @@ const double eps = 1e-6;
 Calculator::Calculator(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::Calculator) {
     ui->setupUi(this);
-    this->tmp = "";
+    this->rowFormula = "";
 }
 
 Calculator::~Calculator() {
@@ -17,142 +18,150 @@ Calculator::~Calculator() {
 
 
 void Calculator::on_num0_clicked() {
-    if (this->tmp != "") {
-        this->tmp += this->ui->num0->text();
-        this->ui->resultbox->setText(this->tmp);
+    if (this->rowFormula != "0") {
+        this->rowFormula += this->ui->num0->text();
+        this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_num1_clicked() {
-    this->tmp += this->ui->num1->text();
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula += this->ui->num1->text();
+    this->ui->resultbox->setText(this->rowFormula);
 }
 
 void Calculator::on_num2_clicked() {
-    this->tmp += this->ui->num2->text();
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula += this->ui->num2->text();
+    this->ui->resultbox->setText(this->rowFormula);
 }
 
 void Calculator::on_num3_clicked() {
-    this->tmp += this->ui->num3->text();
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula += this->ui->num3->text();
+    this->ui->resultbox->setText(this->rowFormula);
 }
 
 void Calculator::on_num4_clicked() {
-    this->tmp += this->ui->num4->text();
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula += this->ui->num4->text();
+    this->ui->resultbox->setText(this->rowFormula);
 }
 
 void Calculator::on_num5_clicked() {
-    this->tmp += this->ui->num5->text();
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula += this->ui->num5->text();
+    this->ui->resultbox->setText(this->rowFormula);
 }
 
 void Calculator::on_num6_clicked() {
-    this->tmp += this->ui->num6->text();
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula += this->ui->num6->text();
+    this->ui->resultbox->setText(this->rowFormula);
 }
 
 void Calculator::on_num7_clicked() {
-    this->tmp += this->ui->num7->text();
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula += this->ui->num7->text();
+    this->ui->resultbox->setText(this->rowFormula);
 }
 
 void Calculator::on_num8_clicked() {
-    this->tmp += this->ui->num8->text();
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula += this->ui->num8->text();
+    this->ui->resultbox->setText(this->rowFormula);
 }
 
 void Calculator::on_num9_clicked() {
-    this->tmp += this->ui->num9->text();
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula += this->ui->num9->text();
+    this->ui->resultbox->setText(this->rowFormula);
 }
 
 void Calculator::on_op_add_clicked() {
-    if (tmp.endsWith("-") || tmp.endsWith("*") || tmp.endsWith("/")) {
-        this->tmp = this->tmp.replace(tmp.length() - 1, 1, "+");
-        this->ui->resultbox->setText(this->tmp);
-    } else if (tmp != "" && !tmp.endsWith("+")) {
-        this->tmp += this->ui->op_add->text();
-        this->ui->resultbox->setText(this->tmp);
+    if (rowFormula.endsWith("-") || rowFormula.endsWith("*") || rowFormula.endsWith("/")) {
+        this->rowFormula = this->rowFormula.replace(rowFormula.length() - 1, 1, "+");
+        this->ui->resultbox->setText(this->rowFormula);
+        return;
+    }
+    if (*(rowFormula.begin()) == '=') {
+       rowFormula = this->rowFormula.mid(2);
+    }
+    cout << "rowFormula: " << (rowFormula.toStdString()) << endl;
+    cout << (*this->rowFormula.toStdString().begin()) << endl;
+    if (rowFormula != "" && !rowFormula.endsWith("+")) {
+        this->rowFormula += this->ui->op_add->text();
+        this->ui->resultbox->setText(this->rowFormula);
     }
 
 }
 
 void Calculator::on_op_sub_clicked() {
-    if (tmp.endsWith("+") || tmp.endsWith("*") || tmp.endsWith("/")) {
-        this->tmp = this->tmp.replace(tmp.length() - 1, 1, "-");
-        this->ui->resultbox->setText(this->tmp);
-    } else if (tmp != "" && !tmp.endsWith("-")) {
-        this->tmp += this->ui->op_sub->text();
-        this->ui->resultbox->setText(this->tmp);
+    if (rowFormula.endsWith("+") || rowFormula.endsWith("*") || rowFormula.endsWith("/")) {
+        this->rowFormula = this->rowFormula.replace(rowFormula.length() - 1, 1, "-");
+        this->ui->resultbox->setText(this->rowFormula);
+    } else if (rowFormula != "" && !rowFormula.endsWith("-")) {
+        this->rowFormula += this->ui->op_sub->text();
+        this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_times_clicked() {
-    if (tmp.endsWith("+") || tmp.endsWith("-") || tmp.endsWith("/")) {
-        this->tmp = this->tmp.replace(tmp.length() - 1, 1, "*");
-        this->ui->resultbox->setText(this->tmp);
-    } else if (tmp != "" && !tmp.endsWith("*")) {
-        this->tmp += this->ui->op_times->text();
-        this->ui->resultbox->setText(this->tmp);
+    if (rowFormula.endsWith("+") || rowFormula.endsWith("-") || rowFormula.endsWith("/")) {
+        this->rowFormula = this->rowFormula.replace(rowFormula.length() - 1, 1, "*");
+        this->ui->resultbox->setText(this->rowFormula);
+    } else if (rowFormula != "" && !rowFormula.endsWith("*")) {
+        this->rowFormula += this->ui->op_times->text();
+        this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_div_clicked() {
-    if (tmp.endsWith("+") || tmp.endsWith("-") || tmp.endsWith("*")) {
-        this->tmp = this->tmp.replace(tmp.length() - 1, 1, "/");
-        this->ui->resultbox->setText(this->tmp);
-    } else if (tmp != "" && !tmp.endsWith("/")) {
-        this->tmp += this->ui->op_div->text();
-        this->ui->resultbox->setText(this->tmp);
+    if (rowFormula.endsWith("+") || rowFormula.endsWith("-") || rowFormula.endsWith("*")) {
+        this->rowFormula = this->rowFormula.replace(rowFormula.length() - 1, 1, "/");
+        this->ui->resultbox->setText(this->rowFormula);
+    } else if (rowFormula != "" && !rowFormula.endsWith("/")) {
+        this->rowFormula += this->ui->op_div->text();
+        this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_equal_clicked() {
-    if (tmp != "") {
-        Calculator::processCalculation(tmp);
-        this->ui->resultbox->setText(this->tmp);
-        this->tmp = "";
+    if (rowFormula != "") {
+        Calculator::processCalculation(rowFormula);
+        this->ui->resultbox->setText(this->rowFormula);
+        this->rowFormula = "";
     }
 }
 
 void Calculator::on_op_dot_clicked() {
-    if (tmp != " " && tmp != "" && !tmp.endsWith(".")) {
-        this->tmp += this->ui->op_dot->text();
-        this->ui->resultbox->setText(this->tmp);
+    if (rowFormula != " " && rowFormula != "" && !rowFormula.endsWith(".")) {
+        this->rowFormula += this->ui->op_dot->text();
+        this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_left_clicked() {
-    if (tmp != " ") {
-        this->tmp += this->ui->op_left->text();
-        this->ui->resultbox->setText(this->tmp);
+    if (rowFormula != " ") {
+        this->rowFormula += this->ui->op_left->text();
+        this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_right_clicked() {
-    if (tmp != " ") {
-        this->tmp += this->ui->op_right->text();
-        this->ui->resultbox->setText(this->tmp);
+    if (rowFormula != " ") {
+        this->rowFormula += this->ui->op_right->text();
+        this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_del_clicked() {
-    if (tmp != " ") {
-        tmp = tmp.left(tmp.length() - 1);
-        this->ui->resultbox->setText(this->tmp);
+    if (rowFormula != " ") {
+        rowFormula = rowFormula.left(rowFormula.length() - 1);
+        this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_C_clicked() {
-    tmp.clear();
+    rowFormula.clear();
     this->ui->resultbox->setText(0);
-    this->tmp = "";
+    this->rowFormula = "";
 }
 
-int Calculator::priority(int state, char a) {//计算操作符优先级的函数，注意state表示运算符状态：
-//这个state只对‘（’起作用
+// 计算操作符优先级的函数，注意state表示运算符状态：
+int Calculator::priority(int state, char a) {
+    // 这个 state 只对‘(’起作用
     int result = 0;
     switch (a) {
         case '+':
@@ -213,12 +222,12 @@ double Calculator::calculate(char op, double op1, double op2) {
 
 /* 将输入的中缀表达式转换为后缀表达式并计算。
  *
- * @param tmp 输入的中缀表达式
+ * @param rowFormula 输入的中缀表达式
  * @throws 括号不匹配时报错。
  * */
-void Calculator::processCalculation(QString &tmp) {
+void Calculator::processCalculation(QString &rowFormula) {
     string s;
-    s = tmp.toStdString();
+    s = rowFormula.toStdString();
 
     // 括号匹配检查。
     int bracketCount = 0;
@@ -226,14 +235,14 @@ void Calculator::processCalculation(QString &tmp) {
         if (c == '(') bracketCount++;
         if (c == ')') bracketCount--;
         if (bracketCount < 0) {
-            this->tmp = "错误：括号不匹配";
-            this->ui->resultbox->setText(this->tmp);
+            this->rowFormula = "错误：括号不匹配";
+            this->ui->resultbox->setText(this->rowFormula);
             return;
         }
     }
     if (bracketCount != 0) {
-        this->tmp = "错误：括号不匹配";
-        this->ui->resultbox->setText(this->tmp);
+        this->rowFormula = "错误：括号不匹配";
+        this->ui->resultbox->setText(this->rowFormula);
         return;
     }
 
@@ -241,8 +250,8 @@ void Calculator::processCalculation(QString &tmp) {
     for (int i = 1; i < s.length(); i++) {
         if ((s[i] == '+' || s[i] == '-' || s[i] == '*' || s[i] == '/') &&
             (s[i - 1] == '+' || s[i - 1] == '-' || s[i - 1] == '*' || s[i - 1] == '/')) {
-            this->tmp = "错误：连续的操作符";
-            this->ui->resultbox->setText(this->tmp);
+            this->rowFormula = "错误：连续的操作符";
+            this->ui->resultbox->setText(this->rowFormula);
             return;
         }
     }
@@ -258,8 +267,8 @@ void Calculator::processCalculation(QString &tmp) {
                 if (s[i] == '.') {
                     // 处理多余小数点。
                     if (hasDecimalPoint) {
-                        this->tmp = "错误：多个小数点";
-                        this->ui->resultbox->setText(this->tmp);
+                        this->rowFormula = "错误：多个小数点";
+                        this->ui->resultbox->setText(this->rowFormula);
                         return;
                     }
                     hasDecimalPoint = true;
@@ -321,8 +330,8 @@ void Calculator::processCalculation(QString &tmp) {
             operation.pop();// ‘(’出栈
             cout << "out op: " << s[i] << endl;
         } else { // 非法字符的处理比如字母
-            this->tmp = "error!";
-            this->ui->resultbox->setText(this->tmp);
+            this->rowFormula = "error!";
+            this->ui->resultbox->setText(this->rowFormula);
             break;
         }
     }
@@ -339,7 +348,7 @@ void Calculator::processCalculation(QString &tmp) {
         operand.push(calculate(temp, op1, op2));
         cout << "in result: " << operand.top() << endl;
     }
-    this->tmp = QString("= ");
-    this->tmp += tmp.number(operand.top());
-    this->ui->resultbox->setText(this->tmp);
+    this->rowFormula = QString("= ");
+    this->rowFormula += rowFormula.number(operand.top());
+    this->ui->resultbox->setText(this->rowFormula);
 }
