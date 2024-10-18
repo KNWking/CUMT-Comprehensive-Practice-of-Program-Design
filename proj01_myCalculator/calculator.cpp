@@ -324,8 +324,7 @@ bool Calculator::isOperator(char c) {
  * @throws 括号不匹配时报错。
  * */
 void Calculator::processCalculation(QString &rowFormula) {
-    string s;
-    s = rowFormula.toStdString();
+    string s = rowFormula.toStdString();
 
     if (!ifBracketsBalanced(s)) {
         setError("括号不匹配");
@@ -355,7 +354,7 @@ void Calculator::processCalculation(QString &rowFormula) {
     bool expectOperand = true; // 用于判断是否期望一个操作数。
 
     for (int i = 0; i < int(s.length()); i++) {
-        if (isdigit(s[i])) {  // 出现数字。
+        if (isdigit(s[i]) || (s[i] == '-' && expectOperand)) {  // 出现数字。
             bool hasDecimalPoint = false; // 用于判断是否有多个小数点。
             if (s[i] == '-') {
                 num.push_back(s[i]);
@@ -377,6 +376,7 @@ void Calculator::processCalculation(QString &rowFormula) {
             operand.push(a);  // 操作数入栈。
             num.clear();  // num临时变量清空以备下次使用。
             i--;  // 位置还原。
+            expectOperand = false;
         } else if (s[i] == '+' || s[i] == '-'
                    || s[i] == '*' || s[i] == '/'
                    || s[i] == '(') { // 出现运算符。
