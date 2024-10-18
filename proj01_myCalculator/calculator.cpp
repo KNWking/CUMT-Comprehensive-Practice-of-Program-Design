@@ -129,7 +129,7 @@ void Calculator::on_op_sub_clicked() {
     if (*(rowFormula.begin()) == '=') {
         rowFormula = this->rowFormula.mid(2);
     }
-    if (rowFormula != "" && !rowFormula.endsWith("-")) {
+    if (!rowFormula.endsWith("-")) {
         this->rowFormula += this->ui->op_sub->text();
         this->ui->resultbox->setText(this->rowFormula);
     }
@@ -183,8 +183,7 @@ void Calculator::on_op_dot_clicked() {
         rowFormula = "";
     }
     if (rowFormula != " " && rowFormula != ""
-        && !rowFormula.endsWith(".")
-        && !rowFormula.toStdString().find('.')) {
+        && !rowFormula.endsWith(".")) {
         this->rowFormula += this->ui->op_dot->text();
         this->ui->resultbox->setText(this->rowFormula);
     }
@@ -305,6 +304,19 @@ bool Calculator::ifBracketsBalanced(const string &str) {
     return leftBracketCount == 0;
 }
 
+bool Calculator::hasConsecutiveOperators(const string &s) {
+    for (int i = 1; i < s.length(); i++) {
+        if (isOperator(s[i]) && isOperator(s[i - 1])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Calculator::isOperator(char c) {
+    return c == '+' || c == '-' || c == '*' || c == '/';
+}
+
 
 /* 将输入的中缀表达式转换为后缀表达式并计算。
  *
@@ -316,34 +328,44 @@ void Calculator::processCalculation(QString &rowFormula) {
     s = rowFormula.toStdString();
 
     if (!ifBracketsBalanced(s)) {
-        this->rowFormula = "error：括号不匹配";
-        this->ui->resultbox->setText(this->rowFormula);
+        setError("括号不匹配");
         return;
     }
 
     // 连续操作符检查。
-    for (int i = 1; i < s.length(); i++) {
-        if ((s[i] == '+' || s[i] == '-' || s[i] == '*' || s[i] == '/') &&
-            (s[i - 1] == '+' || s[i - 1] == '-' || s[i - 1] == '*' || s[i - 1] == '/')) {
-            this->rowFormula = "error：连续的操作符";
-            this->ui->resultbox->setText(this->rowFormula);
-            return;
-        }
+    if (hasConsecutiveOperators(s)) {
+        setError("连续的操作符");
+        return;
     }
 
-    stack<char> operation;  // 存放操作符的栈。
-    stack<double> operand;  // 存放操作数的栈。
+    if (isOperator(*prev(s.end()))) {
+        setError("不能以操作数结尾");
+        return;
+    }
+
+    if (!(s[0] == '-' && s.length() > 1) && isOperator(s[0])) {
+        setError("不能以操作数开头");
+        return;
+    }
+
+    stack<char> operation;
+    stack<double> operand;
     operation.push('#');  // 先将‘#’压栈。
     string num;  // 临时存放一个操作数，确保多位数和有小数点的数为一体。
+    bool expectOperand = true; // 用于判断是否期望一个操作数。
+
     for (int i = 0; i < int(s.length()); i++) {
         if (isdigit(s[i])) {  // 出现数字。
-            bool hasDecimalPoint = false;
-            while (isdigit(s[i]) || s[i] == '.') {  // 将操作数提取完全。
+            bool hasDecimalPoint = false; // 用于判断是否有多个小数点。
+            if (s[i] == '-') {
+                num.push_back(s[i]);
+                i++;
+            }
+            while (i < s.length() && (isdigit(s[i]) || s[i] == '.')) {  // 将操作数提取完全。
                 if (s[i] == '.') {
                     // 处理多余小数点。
                     if (hasDecimalPoint) {
-                        this->rowFormula = "error：多个小数点";
-                        this->ui->resultbox->setText(this->rowFormula);
+                        setError("多个小数点");
                         return;
                     }
                     hasDecimalPoint = true;
@@ -361,6 +383,7 @@ void Calculator::processCalculation(QString &rowFormula) {
             // 优先级比较，计算操作符优先级的函数，
             // 注意 state 表示运算符状态：state = 1 表示还未进栈，
             // state = 0 表示栈内优先级，注意。
+            expectOperand = true;
             if (priority(0, s[i])
                 > priority(1, operation.top())) {
                 operation.push(s[i]);
@@ -378,8 +401,7 @@ void Calculator::processCalculation(QString &rowFormula) {
                     operand.pop();
                     double result = calculate(temp, op1, op2);
                     if (std::isinf(result)) {
-                        this->rowFormula = "error：除数不能为零";
-                        this->ui->resultbox->setText(this->rowFormula);
+                        setError("除数不能为零");
                         return;
                     }
                     operand.push(result);
@@ -387,6 +409,7 @@ void Calculator::processCalculation(QString &rowFormula) {
                 operation.push(s[i]); // 不要忘了最后操作符入栈！！！！！特别是在左括号时特别重要
             }
         } else if (s[i] == ')') { // 扫描到‘)’
+            expectOperand = false;
             while (operation.top() != '(') { // 出栈直至‘(’
                 char temp = operation.top();
                 operation.pop();
@@ -396,16 +419,14 @@ void Calculator::processCalculation(QString &rowFormula) {
                 operand.pop();
                 double result = calculate(temp, op1, op2);
                 if (std::isinf(result)) {
-                    this->rowFormula = "error：除数不能为零";
-                    this->ui->resultbox->setText(this->rowFormula);
+                    setError("除数不能为零");
                     return;
                 }
                 operand.push(result);
             }
             operation.pop();// ‘(’出栈
         } else { // 非法字符的处理比如字母
-            this->rowFormula = "error!";
-            this->ui->resultbox->setText(this->rowFormula);
+            setError("非法字符");
             break;
         }
     }
@@ -418,13 +439,18 @@ void Calculator::processCalculation(QString &rowFormula) {
         operand.pop();
         double result = calculate(temp, op1, op2);
         if (std::isinf(result)) {
-            this->rowFormula = "error：除数不能为零";
-            this->ui->resultbox->setText(this->rowFormula);
+            setError("除数不能为零");
             return;
         }
         operand.push(result);
     }
-    this->rowFormula = QString("= ");
-    this->rowFormula += rowFormula.number(operand.top());
+    this->rowFormula = QString("= ")
+                       + QString::number(operand.top());
+    this->ui->resultbox->setText(this->rowFormula);
+}
+
+void Calculator::setError(const string &message) {
+    this->rowFormula = QString("error：")
+                       + QString::fromStdString(message);
     this->ui->resultbox->setText(this->rowFormula);
 }

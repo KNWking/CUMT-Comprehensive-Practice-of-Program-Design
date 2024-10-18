@@ -7,7 +7,6 @@
 #include <limits>
 #include <QString>
 #include <string>
-#include <iostream>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -67,8 +66,10 @@ private slots:
 
 
 private:
-    // 界面对象和核心功能对象
+    // 界面对象和核心功能对象。
     Ui::Calculator *ui;
+
+    QString rowFormula = "";
 
     int priority(int state, char a);
 
@@ -76,9 +77,16 @@ private:
 
     void processCalculation(QString &rowFormula);
 
+    // 辅助函数。
     bool ifBracketsBalanced(const std::string &str);
 
-    QString rowFormula = "";
+    bool hasConsecutiveOperators(const std::string &s);
+
+    bool isOperator(char c);
+
+    void setError(const std::string &message);
+
+
 };
 
 #endif // CALCULATOR_H
