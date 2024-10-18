@@ -17,7 +17,7 @@ Calculator::~Calculator() {
 
 
 void Calculator::on_num0_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     if (this->rowFormula != "0" || (*(rowFormula.begin()) != '=')) {
@@ -27,7 +27,7 @@ void Calculator::on_num0_clicked() {
 }
 
 void Calculator::on_num1_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     this->rowFormula += this->ui->num1->text();
@@ -35,7 +35,7 @@ void Calculator::on_num1_clicked() {
 }
 
 void Calculator::on_num2_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     this->rowFormula += this->ui->num2->text();
@@ -43,7 +43,7 @@ void Calculator::on_num2_clicked() {
 }
 
 void Calculator::on_num3_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     this->rowFormula += this->ui->num3->text();
@@ -51,7 +51,7 @@ void Calculator::on_num3_clicked() {
 }
 
 void Calculator::on_num4_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     this->rowFormula += this->ui->num4->text();
@@ -59,7 +59,7 @@ void Calculator::on_num4_clicked() {
 }
 
 void Calculator::on_num5_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     this->rowFormula += this->ui->num5->text();
@@ -67,7 +67,7 @@ void Calculator::on_num5_clicked() {
 }
 
 void Calculator::on_num6_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     this->rowFormula += this->ui->num6->text();
@@ -75,7 +75,7 @@ void Calculator::on_num6_clicked() {
 }
 
 void Calculator::on_num7_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     this->rowFormula += this->ui->num7->text();
@@ -83,7 +83,7 @@ void Calculator::on_num7_clicked() {
 }
 
 void Calculator::on_num8_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     this->rowFormula += this->ui->num8->text();
@@ -91,7 +91,7 @@ void Calculator::on_num8_clicked() {
 }
 
 void Calculator::on_num9_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     this->rowFormula += this->ui->num9->text();
@@ -99,7 +99,7 @@ void Calculator::on_num9_clicked() {
 }
 
 void Calculator::on_op_add_clicked() {
-    if(*(rowFormula.begin()) == 'e'){
+    if (*(rowFormula.begin()) == 'e') {
         rowFormula = "";
     }
     if (rowFormula.endsWith("-") || rowFormula.endsWith("*") || rowFormula.endsWith("/")) {
@@ -110,8 +110,6 @@ void Calculator::on_op_add_clicked() {
     if (*(rowFormula.begin()) == '=') {
         rowFormula = this->rowFormula.mid(2);
     }
-    cout << "rowFormula: " << (rowFormula.toStdString()) << endl;
-    cout << (*this->rowFormula.toStdString().begin()) << endl;
     if (rowFormula != "" && !rowFormula.endsWith("+")) {
         this->rowFormula += this->ui->op_add->text();
         this->ui->resultbox->setText(this->rowFormula);
@@ -120,7 +118,7 @@ void Calculator::on_op_add_clicked() {
 }
 
 void Calculator::on_op_sub_clicked() {
-    if(*(rowFormula.begin()) == 'e'){
+    if (*(rowFormula.begin()) == 'e') {
         rowFormula = "";
     }
     if (rowFormula.endsWith("+") || rowFormula.endsWith("*") || rowFormula.endsWith("/")) {
@@ -138,7 +136,7 @@ void Calculator::on_op_sub_clicked() {
 }
 
 void Calculator::on_op_times_clicked() {
-    if(*(rowFormula.begin()) == 'e'){
+    if (*(rowFormula.begin()) == 'e') {
         rowFormula = "";
     }
     if (rowFormula.endsWith("+") || rowFormula.endsWith("-") || rowFormula.endsWith("/")) {
@@ -150,13 +148,13 @@ void Calculator::on_op_times_clicked() {
         rowFormula = this->rowFormula.mid(2);
     }
     if (rowFormula != "" && !rowFormula.endsWith("*")) {
-        this->rowFormula += this->ui->op_times->text();
+        this->rowFormula += '*';
         this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_div_clicked() {
-    if(*(rowFormula.begin()) == 'e'){
+    if (*(rowFormula.begin()) == 'e') {
         rowFormula = "";
     }
     if (rowFormula.endsWith("+") || rowFormula.endsWith("-") || rowFormula.endsWith("*")) {
@@ -168,13 +166,12 @@ void Calculator::on_op_div_clicked() {
         rowFormula = this->rowFormula.mid(2);
     }
     if (rowFormula != "" && !rowFormula.endsWith("/")) {
-        this->rowFormula += this->ui->op_div->text();
+        this->rowFormula += '/';
         this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_equal_clicked() {
-    cout << rowFormula.toStdString() << endl;
     if (rowFormula != "" && (*(rowFormula.begin()) != '=') && (*(rowFormula.begin()) != 'e')) {
         Calculator::processCalculation(rowFormula);
         this->ui->resultbox->setText(this->rowFormula);
@@ -182,17 +179,19 @@ void Calculator::on_op_equal_clicked() {
 }
 
 void Calculator::on_op_dot_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
-    if (rowFormula != " " && rowFormula != "" && !rowFormula.endsWith(".")) {
+    if (rowFormula != " " && rowFormula != ""
+        && !rowFormula.endsWith(".")
+        && !rowFormula.toStdString().find('.')) {
         this->rowFormula += this->ui->op_dot->text();
         this->ui->resultbox->setText(this->rowFormula);
     }
 }
 
 void Calculator::on_op_left_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     if (rowFormula != " " || *rowFormula.begin() != '=') {
@@ -202,7 +201,7 @@ void Calculator::on_op_left_clicked() {
 }
 
 void Calculator::on_op_right_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     if (rowFormula != " " || *rowFormula.begin() != '=') {
@@ -212,7 +211,7 @@ void Calculator::on_op_right_clicked() {
 }
 
 void Calculator::on_op_del_clicked() {
-    if((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')){
+    if ((*(rowFormula.begin()) == '=') || (*(rowFormula.begin()) == 'e')) {
         rowFormula = "";
     }
     if (rowFormula != " " || *rowFormula.begin() != '=') {
@@ -276,9 +275,9 @@ double Calculator::calculate(char op, double op1, double op2) {
             result = op1 * op2;
             break;
         case '/':
-            // 处理除数为 0 的情况。
+            // 返回无穷大表示错误。
             if (abs(op2 - 0) < eps) {
-                throw std::runtime_error("error：除数不能为 0");
+                return numeric_limits<double>::infinity();
             }
             result = op1 / op2;
             break;
@@ -353,20 +352,17 @@ void Calculator::processCalculation(QString &rowFormula) {
                 i++;
             }
             double a = atof(num.c_str());  // string->double
-            cout << "in num: " << a << endl; // console 中显示，方便调试。
             operand.push(a);  // 操作数入栈。
             num.clear();  // num临时变量清空以备下次使用。
             i--;  // 位置还原。
         } else if (s[i] == '+' || s[i] == '-'
                    || s[i] == '*' || s[i] == '/'
                    || s[i] == '(') { // 出现运算符。
+            // 优先级比较，计算操作符优先级的函数，
+            // 注意 state 表示运算符状态：state = 1 表示还未进栈，
+            // state = 0 表示栈内优先级，注意。
             if (priority(0, s[i])
-                > priority(1, operation.top()))
-                // 优先级比较，计算操作符优先级的函数，
-                // 注意 state 表示运算符状态：state = 1 表示还未进栈，
-                // state = 0 表示栈内优先级，注意。
-            {
-                cout << "in op: " << s[i] << endl;
+                > priority(1, operation.top())) {
                 operation.push(s[i]);
             }
                 // 当当前的符号放在栈内，比前一个符号等级高时，直接入栈，比如+比#等级高，*比+等级高，（比*等级高
@@ -375,36 +371,38 @@ void Calculator::processCalculation(QString &rowFormula) {
                        <= priority(1, operation.top())) {
                     // 当当前的符号放在栈内，比前一个符号等级（对于（括号是在栈外的等级）低时，出栈并进行计算直至>
                     char temp = operation.top();
-                    cout << "out op: " << temp << endl;
                     operation.pop();
                     double op2 = operand.top();
-                    cout << "out op2: " << op2 << endl;
                     operand.pop();
                     double op1 = operand.top();
-                    cout << "out op1: " << op1 << endl;
                     operand.pop();
-                    operand.push(calculate(temp, op1, op2));
-                    cout << "in result: " << operand.top() << endl;
+                    double result = calculate(temp, op1, op2);
+                    if (std::isinf(result)) {
+                        this->rowFormula = "error：除数不能为零";
+                        this->ui->resultbox->setText(this->rowFormula);
+                        return;
+                    }
+                    operand.push(result);
                 }
                 operation.push(s[i]); // 不要忘了最后操作符入栈！！！！！特别是在左括号时特别重要
-                cout << "in op: " << s[i] << endl;
             }
         } else if (s[i] == ')') { // 扫描到‘)’
             while (operation.top() != '(') { // 出栈直至‘(’
                 char temp = operation.top();
-                cout << "out op: " << temp << endl;
                 operation.pop();
                 double op2 = operand.top();
-                cout << "out op2: " << op2 << endl;
                 operand.pop();
                 double op1 = operand.top();
-                cout << "out op1: " << op1 << endl;
                 operand.pop();
-                operand.push(calculate(temp, op1, op2));
-                cout << "in result: " << operand.top() << endl;
+                double result = calculate(temp, op1, op2);
+                if (std::isinf(result)) {
+                    this->rowFormula = "error：除数不能为零";
+                    this->ui->resultbox->setText(this->rowFormula);
+                    return;
+                }
+                operand.push(result);
             }
             operation.pop();// ‘(’出栈
-            cout << "out op: " << s[i] << endl;
         } else { // 非法字符的处理比如字母
             this->rowFormula = "error!";
             this->ui->resultbox->setText(this->rowFormula);
@@ -413,16 +411,18 @@ void Calculator::processCalculation(QString &rowFormula) {
     }
     while (operation.top() != '#') { // 扫尾工作
         char temp = operation.top();
-        cout << "out op: " << temp << endl;
         operation.pop();
         double op2 = operand.top();
-        cout << "out op2: " << op2 << endl;
         operand.pop();
         double op1 = operand.top();
-        cout << "out op1: " << op1 << endl;
         operand.pop();
-        operand.push(calculate(temp, op1, op2));
-        cout << "in result: " << operand.top() << endl;
+        double result = calculate(temp, op1, op2);
+        if (std::isinf(result)) {
+            this->rowFormula = "error：除数不能为零";
+            this->ui->resultbox->setText(this->rowFormula);
+            return;
+        }
+        operand.push(result);
     }
     this->rowFormula = QString("= ");
     this->rowFormula += rowFormula.number(operand.top());

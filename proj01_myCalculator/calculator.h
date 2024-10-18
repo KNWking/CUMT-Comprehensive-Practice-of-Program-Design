@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <stack>
 #include <cmath>
+#include <limits>
 #include <QString>
 #include <string>
 #include <iostream>
