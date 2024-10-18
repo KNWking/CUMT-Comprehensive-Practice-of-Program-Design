@@ -172,7 +172,7 @@ void Calculator::on_op_C_clicked() {
     this->rowFormula = "";
 }
 
-// 计算操作符优先级的函数，注意state表示运算符状态：
+// 计算操作符优先级的函数，state 表示运算符状态：
 int Calculator::priority(int state, char a) {
     // 这个 state 只对‘(’起作用
     int result = 0;
@@ -233,6 +233,25 @@ double Calculator::calculate(char op, double op1, double op2) {
     return result;
 }
 
+// 括号匹配检查。
+bool Calculator::ifBracketsBalanced(const string &str) {
+    int leftBracketCount = 0;
+    for (char ch : str) {
+        if (ch == '(') {
+            leftBracketCount++;
+        } else if (ch == ')') {
+            if (leftBracketCount == 0) {
+                return false;
+            } else {
+                leftBracketCount--;
+            }
+        }
+    }
+    // 0 说明左右括号数量一致。
+    return leftBracketCount == 0;
+}
+
+
 /* 将输入的中缀表达式转换为后缀表达式并计算。
  *
  * @param rowFormula 输入的中缀表达式
@@ -242,18 +261,7 @@ void Calculator::processCalculation(QString &rowFormula) {
     string s;
     s = rowFormula.toStdString();
 
-    // 括号匹配检查。
-    int bracketCount = 0;
-    for (char c: s) {
-        if (c == '(') bracketCount++;
-        if (c == ')') bracketCount--;
-        if (bracketCount < 0) {
-            this->rowFormula = "错误：括号不匹配";
-            this->ui->resultbox->setText(this->rowFormula);
-            return;
-        }
-    }
-    if (bracketCount != 0) {
+    if (ifBracketsBalanced(s) != 0) {
         this->rowFormula = "错误：括号不匹配";
         this->ui->resultbox->setText(this->rowFormula);
         return;

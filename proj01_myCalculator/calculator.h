@@ -75,6 +75,8 @@ private:
 
     void processCalculation(QString &rowFormula);
 
+    bool ifBracketsBalanced(const std::string &str);
+
     QString rowFormula = "";
 };
 
