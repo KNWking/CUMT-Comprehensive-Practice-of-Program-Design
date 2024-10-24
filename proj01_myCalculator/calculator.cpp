@@ -333,17 +333,17 @@ void Calculator::processCalculation(QString &rowFormula) {
 
     // 连续操作符检查。
     if (hasConsecutiveOperators(s)) {
-        setError("连续的操作符");
+        setError("连续的运算符");
         return;
     }
 
     if (isOperator(*prev(s.end()))) {
-        setError("不能以操作数结尾");
+        setError("不能以运算符结尾");
         return;
     }
 
     if (!(s[0] == '-' && s.length() > 1) && isOperator(s[0])) {
-        setError("不能以操作数开头");
+        setError("不能以运算符开头");
         return;
     }
 
