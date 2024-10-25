@@ -2,7 +2,7 @@ import sys
 import os
 import random
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QVBoxLayout, QHBoxLayout, QMessageBox,
-                             QLabel, QPushButton, QWidget, QSpinBox, QFrame, QFileDialog, QComboBox)
+                             QLabel, QPushButton, QWidget, QSpinBox, QFrame, QFileDialog, QComboBox, QScrollArea)
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt, QRect, QSize, QTimer
 
@@ -11,21 +11,27 @@ class PuzzleGame(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
-        self.imageList = self.loadImageList('./images') 
+        self.imageList = self.loadImageList('./images')
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateTimer)
         self.timeLeft = 0
 
     def initUI(self):
-        self.setWindowTitle('myPuzzle')
-        self.setGeometry(100, 100, 800, 600)
+        self.setWindowTitle('My Puzzle')
+        self.setFixedSize(800, 600)  # 固定主窗口大小
 
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
 
         self.gridSideNumber = 3  # 默认 3x3 拼图
-        self.puzzleContainer = QFrame(centralWidget)
-        self.puzzleContainer.setGeometry(10, 10, 600, 600)
+
+        # 使用 QScrollArea 来容纳拼图
+        self.scrollArea = QScrollArea(centralWidget)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setFixedSize(600, 600)  # 固定滚动区域大小
+
+        self.puzzleContainer = QFrame()
+        self.puzzleContainer.setFixedSize(580, 580)  # 固定拼图容器大小
         self.puzzleLayout = QGridLayout(self.puzzleContainer)
         self.puzzleLayout.setSpacing(0)
         self.puzzleContainer.setLayout(self.puzzleLayout)
