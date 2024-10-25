@@ -1,9 +1,173 @@
 import sys
-from PyQt6.QtWidgets import QApplication
-from game_controller import GameController
+import random
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QVBoxLayout, QHBoxLayout, QMessageBox,
+                             QLabel, QPushButton, QWidget, QSpinBox, QFrame, QFileDialog)
+from PyQt6.QtGui import QPixmap, QImage
+from PyQt6.QtCore import Qt, QRect, QSize
 
-if __name__ == "__main__":
+
+class PuzzleGame(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle('myPuzzle')
+        self.setGeometry(100, 100, 800, 600)
+
+        centralWidget = QWidget(self)
+        self.setCentralWidget(centralWidget)
+
+        self.gridSideNumber = 3  # 默认 4x4 拼图
+        self.puzzleContainer = QFrame(centralWidget)
+        self.puzzleContainer.setGeometry(10, 10, 600, 600)
+        self.puzzleLayout = QGridLayout(self.puzzleContainer)
+        self.puzzleLayout.setSpacing(0)
+        self.puzzleContainer.setLayout(self.puzzleLayout)
+
+        self.controlPanel = QVBoxLayout()
+        self.gridLayout = QHBoxLayout()
+
+        spinBoxLabel = QLabel("图片切割数量 (单位边):")
+        self.gridSpinBox = QSpinBox()
+        self.gridSpinBox.setMinimum(2)
+        self.gridSpinBox.setMaximum(10)
+        self.gridSpinBox.setValue(self.gridSideNumber)
+        self.gridSpinBox.valueChanged.connect(self.updateGridSize)
+
+        self.gridLayout.addWidget(spinBoxLabel)
+        self.gridLayout.addWidget(self.gridSpinBox)
+
+        self.controlPanel.addLayout(self.gridLayout)
+
+        self.viewOriginalButton = QPushButton("查看原图")
+        self.viewOriginalButton.clicked.connect(self.viewOriginalImage)
+
+        self.shuffleButton = QPushButton("试玩新图")
+        self.shuffleButton.clicked.connect(self.shufflePuzzle)
+
+        self.changeImageButton = QPushButton("切换图片")
+        self.changeImageButton.clicked.connect(self.changeImage)
+
+        self.solvePuzzleButton = QPushButton("图片重排")
+        self.solvePuzzleButton.clicked.connect(self.solvePuzzle)
+
+        self.controlPanel.addWidget(self.viewOriginalButton)
+        self.controlPanel.addWidget(self.shuffleButton)
+        self.controlPanel.addWidget(self.changeImageButton)
+        self.controlPanel.addWidget(self.solvePuzzleButton)
+
+        mainLayout = QHBoxLayout(centralWidget)
+        mainLayout.addWidget(self.puzzleContainer)
+        mainLayout.addLayout(self.controlPanel)
+
+        self.loadImage('example_image.jpg')
+        self.createPuzzle(self.gridSideNumber)
+
+    def loadImage(self, imagePath):
+        self.img = QImage(imagePath)
+        self.originalPixmap = QPixmap.fromImage(self.img)
+        self.puzzlePieces = []
+        self.piecePositions = []
+        self.emptyPosition = (self.gridSideNumber - 1, self.gridSideNumber - 1)  # 初始空白块位置
+
+    def createPuzzle(self, gridSize):
+        self.gridSideNumber = gridSize
+        self.puzzleLayout.setSpacing(0)
+        self.clearLayout(self.puzzleLayout)
+        pieceWidth = self.puzzleContainer.width() // self.gridSideNumber
+        pieceHeight = self.puzzleContainer.height() // self.gridSideNumber
+        self.puzzlePieces = []
+        self.piecePositions = []
+        self.emptyPosition = (gridSize - 1, gridSize - 1)
+
+        for row in range(gridSize):
+            rowItems = []
+            for col in range(gridSize):
+                piece = QLabel(self.puzzleContainer)
+                piece.setFixedSize(pieceWidth, pieceHeight)
+                if not (row == gridSize - 1 and col == gridSize - 1):  # Skip bottom-right corner
+                    x = col * pieceWidth
+                    y = row * pieceHeight
+                    piece.setPixmap(self.originalPixmap.copy(QRect(x, y, pieceWidth, pieceHeight)))
+                else:
+                    piece.setStyleSheet("background-color: white;")
+                piece.setScaledContents(True)
+                # 将鼠标事件传递给 movePiece 方法并附上块的位置
+                piece.mousePressEvent = self.createMousePressEvent(row, col)
+                self.puzzleLayout.addWidget(piece, row, col)
+                rowItems.append(piece)
+                self.piecePositions.append((row, col))
+            self.puzzlePieces.append(rowItems)
+
+        self.shufflePuzzle()
+
+    def clearLayout(self, layout):
+        if layout is not None:
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+
+    def updateGridSize(self):
+        newSize = self.gridSpinBox.value()
+        self.createPuzzle(newSize)
+
+    def viewOriginalImage(self):
+        msgBox = QMessageBox(self)
+        pixmap = self.originalPixmap.scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio)
+        msgBox.setIconPixmap(pixmap)
+        msgBox.setWindowTitle("Original Image")
+        msgBox.exec()
+
+    def shufflePuzzle(self):
+        positions = self.piecePositions[:-1]
+        random.shuffle(positions)  # 随机打乱拼图块
+        positions.append(self.emptyPosition)
+
+        for idx, position in enumerate(positions):
+            row, col = divmod(idx, self.gridSideNumber)
+            piece = self.puzzlePieces[position[0]][position[1]]
+            self.puzzleLayout.addWidget(piece, row, col)
+
+        self.piecePositions = positions
+
+    def createMousePressEvent(self, row, col):
+        print("click", row, col)
+        return lambda event: self.movePiece(row, col)
+
+    def movePiece(self, row, col):
+        emptyRow, emptyCol = self.emptyPosition
+        if (row == emptyRow and abs(col - emptyCol) == 1) or (col == emptyCol and abs(row - emptyRow) == 1):
+            emptyPiece = self.puzzlePieces[emptyRow][emptyCol]
+            piece = self.puzzlePieces[row][col]
+            self.puzzleLayout.addWidget(piece, emptyRow, emptyCol)
+            self.puzzleLayout.addWidget(emptyPiece, row, col)
+            self.piecePositions[self.piecePositions.index((row, col))] = (emptyRow, emptyCol)
+            self.piecePositions[-1] = (row, col)
+            self.emptyPosition = (row, col)
+
+            if self.isSolved():
+                QMessageBox.information(self, '恭喜', '拼图完成!')
+
+    def changeImage(self):
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getOpenFileName(self, "选择图片", "",
+                                                  "Images (*.png *.jpg *.bmp);;All Files (*)", options=options)
+        if fileName:
+            self.loadImage(fileName)
+            self.createPuzzle(self.gridSideNumber)
+
+    def solvePuzzle(self):
+        self.createPuzzle(self.gridSideNumber)
+
+    def isSolved(self):
+        return self.piecePositions == sorted(self.piecePositions)
+
+
+if __name__ == '__main__':
     app = QApplication(sys.argv)
-    game = GameController()
-    game.show()
+    ex = PuzzleGame()
+    ex.show()
     sys.exit(app.exec())

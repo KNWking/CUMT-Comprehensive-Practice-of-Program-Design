@@ -9,7 +9,7 @@ from puzzle_board import PuzzleBoard
 class GameController(QWidget):
     def __init__(self):
         super().__init__()
-        self.image_path = "resources/images/default.jpg"
+        self.image_path = "resources/images/img01.jpg"
         self.rows = 3
         self.cols = 3
         self.init_ui()
