@@ -15,23 +15,28 @@ class ViewOriginalDialog(QDialog):
         self.setWindowTitle("原图")
         self.setGeometry(100, 100, 600, 600)  # 设置初始大小
 
+        self.originalPixmap = pixmap
+
         layout = QVBoxLayout(self)
-
-        scrollArea = QScrollArea()
-        scrollArea.setWidgetResizable(True)
-
         self.imageLabel = QLabel()
-        self.imageLabel.setPixmap(pixmap)
-        self.imageLabel.setScaledContents(True)
-
-        scrollArea.setWidget(self.imageLabel)
-        layout.addWidget(scrollArea)
+        self.imageLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.imageLabel)
 
         self.setLayout(layout)
+        self.updateImage()
 
-    def resizeEvent(self, event):
+    def resizeEvent(self, event: QResizeEvent):
         super().resizeEvent(event)
-        self.imageLabel.setFixedSize(self.size())
+        self.updateImage()
+
+    def updateImage(self):
+        if self.originalPixmap:
+            scaled_pixmap = self.originalPixmap.scaled(
+                self.size(),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+            self.imageLabel.setPixmap(scaled_pixmap)
 
 
 class PuzzleGame(QMainWindow):
