@@ -13,9 +13,13 @@ class ViewOriginalDialog(QDialog):
     def __init__(self, parent=None, pixmap=None):
         super().__init__(parent)
         self.setWindowTitle("原图")
-        self.setGeometry(100, 100, 600, 600)  # 设置初始大小
-
         self.originalPixmap = pixmap
+        self.aspectRatio = pixmap.width() / pixmap.height()
+
+        # 设置初始大小
+        initial_width = 300
+        initial_height = int(initial_width / self.aspectRatio)
+        self.setGeometry(100, 100, initial_width, initial_height)
 
         layout = QVBoxLayout(self)
         self.imageLabel = QLabel()
@@ -26,7 +30,11 @@ class ViewOriginalDialog(QDialog):
         self.updateImage()
 
     def resizeEvent(self, event: QResizeEvent):
-        super().resizeEvent(event)
+        # 保持宽高比
+        new_size = event.size()
+        new_width = new_size.width()
+        new_height = int(new_width / self.aspectRatio)
+        self.resize(new_width, new_height)
         self.updateImage()
 
     def updateImage(self):
@@ -37,6 +45,9 @@ class ViewOriginalDialog(QDialog):
                 Qt.TransformationMode.SmoothTransformation
             )
             self.imageLabel.setPixmap(scaled_pixmap)
+
+    def sizeHint(self):
+        return QSize(600, int(600 / self.aspectRatio))
 
 
 class PuzzleGame(QMainWindow):
@@ -193,7 +204,7 @@ class PuzzleGame(QMainWindow):
 
     def viewOriginalImage(self):
         dialog = ViewOriginalDialog(self, self.originalPixmap)
-        dialog.setMinimumSize(100, 100)  # 设置一个较小的最小尺寸
+        dialog.setMinimumSize(100, int(100 / dialog.aspectRatio))
         dialog.exec()
 
     def shufflePuzzle(self):
