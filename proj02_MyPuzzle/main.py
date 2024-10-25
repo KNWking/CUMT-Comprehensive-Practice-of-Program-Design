@@ -17,7 +17,7 @@ class PuzzleGame(QMainWindow):
         self.timeLeft = 0
 
     def initUI(self):
-        self.setWindowTitle('My Puzzle')
+        self.setWindowTitle('myPuzzle')
         self.setFixedSize(800, 600)  # 固定主窗口大小
 
         centralWidget = QWidget(self)
@@ -35,6 +35,8 @@ class PuzzleGame(QMainWindow):
         self.puzzleLayout = QGridLayout(self.puzzleContainer)
         self.puzzleLayout.setSpacing(0)
         self.puzzleContainer.setLayout(self.puzzleLayout)
+
+        self.scrollArea.setWidget(self.puzzleContainer)
 
         self.controlPanel = QVBoxLayout()
         self.gridLayout = QHBoxLayout()
@@ -87,7 +89,7 @@ class PuzzleGame(QMainWindow):
         self.controlPanel.addWidget(self.timerLabel)
 
         mainLayout = QHBoxLayout(centralWidget)
-        mainLayout.addWidget(self.puzzleContainer)
+        mainLayout.addWidget(self.scrollArea)
         mainLayout.addLayout(self.controlPanel)
 
         self.loadImage('example_image.jpg')
@@ -126,12 +128,15 @@ class PuzzleGame(QMainWindow):
         for row in range(gridSize):
             rowItems = []
             for col in range(gridSize):
-                piece = QLabel(self.puzzleContainer)
+                piece = QLabel()
                 piece.setFixedSize(pieceWidth, pieceHeight)
                 if not (row == gridSize - 1 and col == gridSize - 1):  # Skip bottom-right corner
-                    x = col * pieceWidth
-                    y = row * pieceHeight
-                    piece.setPixmap(self.originalPixmap.copy(QRect(x, y, pieceWidth, pieceHeight)))
+                    x = col * (self.originalPixmap.width() // gridSize)
+                    y = row * (self.originalPixmap.height() // gridSize)
+                    piecePixmap = self.originalPixmap.copy(
+                        QRect(x, y, self.originalPixmap.width() // gridSize, self.originalPixmap.height() // gridSize))
+                    piece.setPixmap(piecePixmap.scaled(pieceWidth, pieceHeight, Qt.AspectRatioMode.KeepAspectRatio,
+                                                       Qt.TransformationMode.SmoothTransformation))
                 else:
                     piece.setStyleSheet("background-color: white;")
                 piece.setScaledContents(True)
