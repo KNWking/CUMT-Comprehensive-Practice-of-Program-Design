@@ -2,9 +2,36 @@ import sys
 import os
 import random
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QVBoxLayout, QHBoxLayout, QMessageBox,
-                             QLabel, QPushButton, QWidget, QSpinBox, QFrame, QFileDialog, QComboBox, QScrollArea)
-from PyQt6.QtGui import QPixmap, QImage
+                             QLabel, QPushButton, QWidget, QSpinBox, QFrame, QFileDialog, QComboBox, QSizePolicy,
+                             QDialog, QScrollArea)
+from PyQt6.QtGui import QPixmap, QImage, QResizeEvent
 from PyQt6.QtCore import Qt, QRect, QSize, QTimer
+
+
+# 查看原图的对话框
+class ViewOriginalDialog(QDialog):
+    def __init__(self, parent=None, pixmap=None):
+        super().__init__(parent)
+        self.setWindowTitle("原图")
+        self.setGeometry(100, 100, 600, 600)  # 设置初始大小
+
+        layout = QVBoxLayout(self)
+
+        scrollArea = QScrollArea()
+        scrollArea.setWidgetResizable(True)
+
+        self.imageLabel = QLabel()
+        self.imageLabel.setPixmap(pixmap)
+        self.imageLabel.setScaledContents(True)
+
+        scrollArea.setWidget(self.imageLabel)
+        layout.addWidget(scrollArea)
+
+        self.setLayout(layout)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.imageLabel.setFixedSize(self.size())
 
 
 class PuzzleGame(QMainWindow):
@@ -18,27 +45,21 @@ class PuzzleGame(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle('myPuzzle')
-        self.setFixedSize(800, 600)  # 固定主窗口大小
+        self.resize(800, 600)  # 设置初始大小，但允许调整
 
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
 
         self.gridSideNumber = 3  # 默认 3x3 拼图
 
-        # 使用 QScrollArea 来容纳拼图
-        self.scrollArea = QScrollArea(centralWidget)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setFixedSize(600, 600)  # 固定滚动区域大小
-
-        self.puzzleContainer = QFrame()
-        self.puzzleContainer.setFixedSize(580, 580)  # 固定拼图容器大小
+        self.puzzleContainer = QFrame(centralWidget)
+        self.puzzleContainer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.puzzleLayout = QGridLayout(self.puzzleContainer)
         self.puzzleLayout.setSpacing(0)
         self.puzzleContainer.setLayout(self.puzzleLayout)
 
-        self.scrollArea.setWidget(self.puzzleContainer)
-
         self.controlPanel = QVBoxLayout()
+        self.controlPanel.setSpacing(10)
         self.gridLayout = QHBoxLayout()
 
         spinBoxLabel = QLabel("图片切割数量 (单位边):")
@@ -89,8 +110,8 @@ class PuzzleGame(QMainWindow):
         self.controlPanel.addWidget(self.timerLabel)
 
         mainLayout = QHBoxLayout(centralWidget)
-        mainLayout.addWidget(self.scrollArea)
-        mainLayout.addLayout(self.controlPanel)
+        mainLayout.addWidget(self.puzzleContainer, 4)  # 拼图区域占4份
+        mainLayout.addLayout(self.controlPanel, 1)  # 控制面板占1份
 
         self.loadImage('example_image.jpg')
         self.createPuzzle(self.gridSideNumber)
@@ -106,14 +127,18 @@ class PuzzleGame(QMainWindow):
 
     def loadImage(self, imagePath):
         self.img = QImage(imagePath)
-        self.originalPixmap = QPixmap.fromImage(self.img).scaled(
-            self.puzzleContainer.size(),
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation
-        )
+        self.originalPixmap = QPixmap.fromImage(self.img)
         self.puzzlePieces = []
         self.piecePositions = []
-        self.emptyPosition = (self.gridSideNumber - 1, self.gridSideNumber - 1)  # 初始空白块位置
+        self.emptyPosition = (self.gridSideNumber - 1, self.gridSideNumber - 1)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.updatePuzzleSize()
+
+    def updatePuzzleSize(self):
+        if hasattr(self, 'originalPixmap'):
+            self.createPuzzle(self.gridSideNumber)
 
     def createPuzzle(self, gridSize):
         self.gridSideNumber = gridSize
@@ -129,7 +154,8 @@ class PuzzleGame(QMainWindow):
             rowItems = []
             for col in range(gridSize):
                 piece = QLabel()
-                piece.setFixedSize(pieceWidth, pieceHeight)
+                piece.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+                piece.setMinimumSize(1, 1)  # 允许缩小到最小1x1像素
                 if not (row == gridSize - 1 and col == gridSize - 1):  # Skip bottom-right corner
                     x = col * (self.originalPixmap.width() // gridSize)
                     y = row * (self.originalPixmap.height() // gridSize)
@@ -140,7 +166,6 @@ class PuzzleGame(QMainWindow):
                 else:
                     piece.setStyleSheet("background-color: white;")
                 piece.setScaledContents(True)
-                # 将鼠标事件传递给 movePiece 方法并附上块的位置
                 piece.mousePressEvent = self.createMousePressEvent(row, col)
                 self.puzzleLayout.addWidget(piece, row, col)
                 rowItems.append(piece)
@@ -162,14 +187,9 @@ class PuzzleGame(QMainWindow):
         self.createPuzzle(newSize)
 
     def viewOriginalImage(self):
-        if not hasattr(self, 'originalImageLabel'):
-            self.originalImageLabel = QLabel(self)
-            self.originalImageLabel.setFixedSize(200, 200)
-            self.originalImageLabel.move(10, self.height() - 210)
-            self.originalImageLabel.setScaledContents(True)
-
-        self.originalImageLabel.setPixmap(self.originalPixmap)
-        self.originalImageLabel.show()
+        dialog = ViewOriginalDialog(self, self.originalPixmap)
+        dialog.setMinimumSize(100, 100)  # 设置一个较小的最小尺寸
+        dialog.exec()
 
     def shufflePuzzle(self):
         positions = self.piecePositions[:-1]
