@@ -10,44 +10,7 @@ from PyQt6.QtCore import Qt, QRect, QSize, QTimer, QPoint
 
 # 查看原图的对话框
 class ViewOriginalDialog(QDialog):
-    def __init__(self, parent=None, pixmap=None):
-        super().__init__(parent)
-        self.setWindowTitle("原图")
-        self.originalPixmap = pixmap
-        self.aspectRatio = pixmap.width() / pixmap.height()
-
-        # 设置初始大小
-        initial_width = 300
-        initial_height = int(initial_width / self.aspectRatio)
-        self.resize(initial_width, initial_height)
-
-        layout = QVBoxLayout(self)
-        self.imageLabel = QLabel()
-        self.imageLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.imageLabel)
-
-        self.setLayout(layout)
-        self.updateImage()
-
-    def resizeEvent(self, event: QResizeEvent):
-        # 保持宽高比
-        new_size = event.size()
-        new_width = new_size.width()
-        new_height = int(new_width / self.aspectRatio)
-        self.resize(new_width, new_height)
-        self.updateImage()
-
-    def updateImage(self):
-        if self.originalPixmap:
-            scaled_pixmap = self.originalPixmap.scaled(
-                self.size(),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-            )
-            self.imageLabel.setPixmap(scaled_pixmap)
-
-    def sizeHint(self):
-        return QSize(600, int(600 / self.aspectRatio))
+    # 略
 
 
 class PuzzleGame(QMainWindow):
@@ -133,20 +96,13 @@ class PuzzleGame(QMainWindow):
         self.createPuzzle(self.gridSideNumber)
 
     def loadImageList(self, folder):
-        return [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(('.png', '.jpg', '.bmp'))]
+        # 略
 
     def randomImage(self):
-        if self.imageList:
-            randomImagePath = random.choice(self.imageList)
-            self.loadImage(randomImagePath)
-            self.createPuzzle(self.gridSideNumber)
+        # 略
 
     def loadImage(self, imagePath):
-        self.img = QImage(imagePath)
-        self.originalPixmap = QPixmap.fromImage(self.img)
-        self.puzzlePieces = []
-        self.piecePositions = []
-        self.emptyPosition = (self.gridSideNumber - 1, self.gridSideNumber - 1)
+        # 略
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -201,19 +157,7 @@ class PuzzleGame(QMainWindow):
         self.createPuzzle(newSize)
 
     def viewOriginalImage(self):
-        dialog = ViewOriginalDialog(self, self.originalPixmap)
-        dialog.setMinimumSize(100, int(100 / dialog.aspectRatio))
-
-        # 计算对话框应该显示的位置
-        main_window_center = self.geometry().center()
-        dialog_size = dialog.size()
-        dialog_position = QPoint(
-            main_window_center.x() - dialog_size.width() // 2,
-            main_window_center.y() - dialog_size.height() // 2
-        )
-        dialog.move(dialog_position)
-
-        dialog.exec()
+        # 略
 
     def shufflePuzzle(self):
         positions = [(r, c) for r in range(self.gridSideNumber) for c in range(self.gridSideNumber)]
@@ -264,12 +208,7 @@ class PuzzleGame(QMainWindow):
         return row_diff <= 1 and col_diff <= 1 and (row_diff != 0 or col_diff != 0)
 
     def changeImage(self):
-        options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getOpenFileName(self, "选择图片", "",
-                                                  "Images (*.png *.jpg *.bmp);;All Files (*)", options=options)
-        if fileName:
-            self.loadImage(fileName)
-            self.createPuzzle(self.gridSideNumber)
+        # 略
 
     def solvePuzzle(self):
         self.createPuzzle(self.gridSideNumber)
@@ -282,31 +221,13 @@ class PuzzleGame(QMainWindow):
         return True
 
     def setDifficulty(self, difficulty):
-        if difficulty == "容易":
-            self.gridSideNumber = 3
-        elif difficulty == "中等":
-            self.gridSideNumber = 4
-        elif difficulty == "困难":
-            self.gridSideNumber = 5
-        else:
-            self.gridSideNumber = int(difficulty)
-
-        self.gridSpinBox.setValue(self.gridSideNumber)
-        self.createPuzzle(self.gridSideNumber)
+        # 略
 
     def startChallenge(self):
-        self.timeLeft = 60  # 设置挑战时间（秒）
-        self.timer.start(1000)  # 每秒更新一次
-        self.shufflePuzzle()
-        self.challengeButton.setEnabled(False)
+        # 略
 
     def updateTimer(self):
-        self.timeLeft -= 1
-        self.timerLabel.setText(f"时间: {self.timeLeft}")
-        if self.timeLeft <= 0:
-            self.timer.stop()
-            QMessageBox.information(self, '挑战失败', '时间到！')
-            self.challengeButton.setEnabled(True)
+        # 略
 
 
 if __name__ == '__main__':
