@@ -162,12 +162,11 @@ class PuzzleGame(QMainWindow):
         self.clearLayout(self.puzzleLayout)
         pieceWidth = self.puzzleContainer.width() // self.gridSideNumber
         pieceHeight = self.puzzleContainer.height() // self.gridSideNumber
-        self.puzzlePieces = []
+        self.puzzlePieces = [[None for _ in range(gridSize)] for _ in range(gridSize)]
         self.piecePositions = []
         self.emptyPosition = (gridSize - 1, gridSize - 1)
 
         for row in range(gridSize):
-            rowItems = []
             for col in range(gridSize):
                 piece = QLabel()
                 piece.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -182,11 +181,10 @@ class PuzzleGame(QMainWindow):
                 else:
                     piece.setStyleSheet("background-color: white;")
                 piece.setScaledContents(True)
-                piece.mousePressEvent = self.createMousePressEvent(row, col)
+                piece.mousePressEvent = lambda event, r=row, c=col: self.movePiece(r, c)
                 self.puzzleLayout.addWidget(piece, row, col)
-                rowItems.append(piece)
+                self.puzzlePieces[row][col] = piece
                 self.piecePositions.append((row, col))
-            self.puzzlePieces.append(rowItems)
 
         self.shufflePuzzle()
 
@@ -218,32 +216,38 @@ class PuzzleGame(QMainWindow):
         dialog.exec()
 
     def shufflePuzzle(self):
-        positions = self.piecePositions[:-1]
+        positions = [(r, c) for r in range(self.gridSideNumber) for c in range(self.gridSideNumber)]
+        positions.remove(self.emptyPosition)
         random.shuffle(positions)  # 随机打乱拼图块
         positions.append(self.emptyPosition)
 
-        for idx, position in enumerate(positions):
-            row, col = divmod(idx, self.gridSideNumber)
-            piece = self.puzzlePieces[position[0]][position[1]]
-            self.puzzleLayout.addWidget(piece, row, col)
+        for idx, (row, col) in enumerate(positions):
+            newRow, newCol = divmod(idx, self.gridSideNumber)
+            piece = self.puzzlePieces[row][col]
+            self.puzzleLayout.addWidget(piece, newRow, newCol)
+            if (row, col) == self.emptyPosition:
+                self.emptyPosition = (newRow, newCol)
 
         self.piecePositions = positions
 
-    def createMousePressEvent(self, row, col):
-        print("click", row, col)
-        return lambda event: self.movePiece(row, col)
-
     def movePiece(self, row, col):
         emptyRow, emptyCol = self.emptyPosition
-        if (row == emptyRow and abs(col - emptyCol) == 1) or (col == emptyCol and abs(row - emptyRow) == 1):
-            emptyPiece = self.puzzlePieces[emptyRow][emptyCol]
-            piece = self.puzzlePieces[row][col]
-            self.puzzleLayout.addWidget(piece, emptyRow, emptyCol)
-            self.puzzleLayout.addWidget(emptyPiece, row, col)
-            self.piecePositions[self.piecePositions.index((row, col))] = (emptyRow, emptyCol)
+        if self.isAdjacent(row, col, emptyRow, emptyCol):
+            # 交换拼图块
+            self.puzzlePieces[row][col], self.puzzlePieces[emptyRow][emptyCol] \
+                = self.puzzlePieces[emptyRow][emptyCol], self.puzzlePieces[row][col]
+
+            # 更新布局
+            self.puzzleLayout.addWidget(self.puzzlePieces[emptyRow][emptyCol], emptyRow, emptyCol)
+            self.puzzleLayout.addWidget(self.puzzlePieces[row][col], row, col)
+
+            # 更新位置信息
+            clickedPieceIndex = self.piecePositions.index((row, col))
+            self.piecePositions[clickedPieceIndex] = (emptyRow, emptyCol)
             self.piecePositions[-1] = (row, col)
             self.emptyPosition = (row, col)
 
+            # 检查是否完成拼图
             if self.isSolved():
                 if self.timer.isActive():
                     self.timer.stop()
@@ -251,6 +255,9 @@ class PuzzleGame(QMainWindow):
                     self.challengeButton.setEnabled(True)
                 else:
                     QMessageBox.information(self, '恭喜', '拼图完成!')
+
+    def isAdjacent(self, row1, col1, row2, col2):
+        return (abs(row1 - row2) == 1 and col1 == col2) or (abs(col1 - col2) == 1 and row1 == row2)
 
     def changeImage(self):
         options = QFileDialog.Options()
