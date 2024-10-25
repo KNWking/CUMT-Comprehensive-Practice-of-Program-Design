@@ -77,7 +77,8 @@ void MortgageCalculator::calculateEqualPrincipal() {
         totalPaymentTemp += monthlyPrincipal + monthlyInterest;
     }
 
-    monthlyPayment = totalPaymentTemp / totalMonths; // Average monthly payment
+    // 每月平均支付钱数。
+    monthlyPayment = totalPaymentTemp / totalMonths;
     totalInterest = totalInterestTemp;
     totalPayment = totalPaymentTemp;
 }
