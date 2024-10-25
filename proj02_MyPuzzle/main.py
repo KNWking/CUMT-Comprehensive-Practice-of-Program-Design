@@ -2,31 +2,19 @@ import sys
 import os
 import random
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QVBoxLayout, QHBoxLayout, QMessageBox,
-                             QLabel, QPushButton, QWidget, QSpinBox, QFrame, QFileDialog)
+                             QLabel, QPushButton, QWidget, QSpinBox, QFrame, QFileDialog, QComboBox)
 from PyQt6.QtGui import QPixmap, QImage
-from PyQt6.QtCore import Qt, QRect, QSize
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import Qt, QRect, QSize, QTimer
 
 
 class PuzzleGame(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
-        self.imageList = self.loadImageList('path/to/image/folder')
+        self.imageList = self.loadImageList('./images') 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateTimer)
         self.timeLeft = 0
-        self.timerLabel = QLabel("时间: 0", self)
-        self.controlPanel.addWidget(self.timerLabel)
-
-    def loadImageList(self, folder):
-        return [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(('.png', '.jpg', '.bmp'))]
-
-    def randomImage(self):
-        if self.imageList:
-            randomImagePath = random.choice(self.imageList)
-            self.loadImage(randomImagePath)
-            self.createPuzzle(self.gridSideNumber)
 
     def initUI(self):
         self.setWindowTitle('myPuzzle')
@@ -35,7 +23,7 @@ class PuzzleGame(QMainWindow):
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
 
-        self.gridSideNumber = 3  # 默认 4x4 拼图
+        self.gridSideNumber = 3  # 默认 3x3 拼图
         self.puzzleContainer = QFrame(centralWidget)
         self.puzzleContainer.setGeometry(10, 10, 600, 600)
         self.puzzleLayout = QGridLayout(self.puzzleContainer)
@@ -69,10 +57,28 @@ class PuzzleGame(QMainWindow):
         self.solvePuzzleButton = QPushButton("图片重排")
         self.solvePuzzleButton.clicked.connect(self.solvePuzzle)
 
+        self.randomImageButton = QPushButton("随机图片")
+        self.randomImageButton.clicked.connect(self.randomImage)
+
+        self.difficultyLabel = QLabel("难度:")
+        self.difficultyComboBox = QComboBox()
+        self.difficultyComboBox.addItems(["容易", "中等", "困难"])
+        self.difficultyComboBox.currentTextChanged.connect(self.setDifficulty)
+
+        self.challengeButton = QPushButton("开始挑战")
+        self.challengeButton.clicked.connect(self.startChallenge)
+
+        self.timerLabel = QLabel("时间: 0", self)
+
         self.controlPanel.addWidget(self.viewOriginalButton)
         self.controlPanel.addWidget(self.shuffleButton)
         self.controlPanel.addWidget(self.changeImageButton)
         self.controlPanel.addWidget(self.solvePuzzleButton)
+        self.controlPanel.addWidget(self.randomImageButton)
+        self.controlPanel.addWidget(self.difficultyLabel)
+        self.controlPanel.addWidget(self.difficultyComboBox)
+        self.controlPanel.addWidget(self.challengeButton)
+        self.controlPanel.addWidget(self.timerLabel)
 
         mainLayout = QHBoxLayout(centralWidget)
         mainLayout.addWidget(self.puzzleContainer)
@@ -80,6 +86,15 @@ class PuzzleGame(QMainWindow):
 
         self.loadImage('example_image.jpg')
         self.createPuzzle(self.gridSideNumber)
+
+    def loadImageList(self, folder):
+        return [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(('.png', '.jpg', '.bmp'))]
+
+    def randomImage(self):
+        if self.imageList:
+            randomImagePath = random.choice(self.imageList)
+            self.loadImage(randomImagePath)
+            self.createPuzzle(self.gridSideNumber)
 
     def loadImage(self, imagePath):
         self.img = QImage(imagePath)
@@ -173,7 +188,12 @@ class PuzzleGame(QMainWindow):
             self.emptyPosition = (row, col)
 
             if self.isSolved():
-                QMessageBox.information(self, '恭喜', '拼图完成!')
+                if self.timer.isActive():
+                    self.timer.stop()
+                    QMessageBox.information(self, '恭喜', f'拼图完成! 用时: {60 - self.timeLeft} 秒')
+                    self.challengeButton.setEnabled(True)
+                else:
+                    QMessageBox.information(self, '恭喜', '拼图完成!')
 
     def changeImage(self):
         options = QFileDialog.Options()
@@ -210,6 +230,7 @@ class PuzzleGame(QMainWindow):
         self.timeLeft = 60  # 设置挑战时间（秒）
         self.timer.start(1000)  # 每秒更新一次
         self.shufflePuzzle()
+        self.challengeButton.setEnabled(False)
 
     def updateTimer(self):
         self.timeLeft -= 1
@@ -217,12 +238,7 @@ class PuzzleGame(QMainWindow):
         if self.timeLeft <= 0:
             self.timer.stop()
             QMessageBox.information(self, '挑战失败', '时间到！')
-
-    def movePiece(self, row, col):
-        # ... 现有的移动逻辑 ...
-        if self.isSolved():
-            self.timer.stop()
-            QMessageBox.information(self, '恭喜', f'拼图完成! 用时: {60 - self.timeLeft} 秒')
+            self.challengeButton.setEnabled(True)
 
 
 if __name__ == '__main__':
