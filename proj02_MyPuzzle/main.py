@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QVBoxLayout
                              QLabel, QPushButton, QWidget, QSpinBox, QFrame, QFileDialog, QComboBox, QSizePolicy,
                              QDialog, QScrollArea)
 from PyQt6.QtGui import QPixmap, QImage, QResizeEvent
-from PyQt6.QtCore import Qt, QRect, QSize, QTimer
+from PyQt6.QtCore import Qt, QRect, QSize, QTimer, QPoint
 
 
 # 查看原图的对话框
@@ -19,7 +19,7 @@ class ViewOriginalDialog(QDialog):
         # 设置初始大小
         initial_width = 300
         initial_height = int(initial_width / self.aspectRatio)
-        self.setGeometry(100, 100, initial_width, initial_height)
+        self.resize(initial_width, initial_height)
 
         layout = QVBoxLayout(self)
         self.imageLabel = QLabel()
@@ -205,6 +205,16 @@ class PuzzleGame(QMainWindow):
     def viewOriginalImage(self):
         dialog = ViewOriginalDialog(self, self.originalPixmap)
         dialog.setMinimumSize(100, int(100 / dialog.aspectRatio))
+
+        # 计算对话框应该显示的位置
+        main_window_center = self.geometry().center()
+        dialog_size = dialog.size()
+        dialog_position = QPoint(
+            main_window_center.x() - dialog_size.width() // 2,
+            main_window_center.y() - dialog_size.height() // 2
+        )
+        dialog.move(dialog_position)
+
         dialog.exec()
 
     def shufflePuzzle(self):
