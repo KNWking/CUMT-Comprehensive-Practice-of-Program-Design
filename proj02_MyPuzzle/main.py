@@ -234,8 +234,9 @@ class PuzzleGame(QMainWindow):
         emptyRow, emptyCol = self.emptyPosition
         if self.isAdjacent(row, col, emptyRow, emptyCol):
             # 交换拼图块
-            self.puzzlePieces[row][col], self.puzzlePieces[emptyRow][emptyCol] \
-                = self.puzzlePieces[emptyRow][emptyCol], self.puzzlePieces[row][col]
+            temp = self.puzzlePieces[row][col]
+            self.puzzlePieces[row][col] = self.puzzlePieces[emptyRow][emptyCol]
+            self.puzzlePieces[emptyRow][emptyCol] = temp
 
             # 更新布局
             self.puzzleLayout.addWidget(self.puzzlePieces[emptyRow][emptyCol], emptyRow, emptyCol)
