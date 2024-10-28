@@ -50,6 +50,13 @@ class ViewOriginalDialog(QDialog):
         return QSize(600, int(600 / self.aspectRatio))
 
 
+class PuzzlePiece(QLabel):
+    def __init__(self, row, col, parent=None):
+        super().__init__(parent)
+        self.row = row
+        self.col = col
+
+
 class PuzzleGame(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -168,10 +175,10 @@ class PuzzleGame(QMainWindow):
 
         for row in range(gridSize):
             for col in range(gridSize):
-                piece = QLabel()
+                piece = PuzzlePiece(row, col)
                 piece.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-                piece.setMinimumSize(1, 1)  # 允许缩小到最小1x1像素
-                if not (row == gridSize - 1 and col == gridSize - 1):  # Skip bottom-right corner
+                piece.setMinimumSize(1, 1)
+                if not (row == gridSize - 1 and col == gridSize - 1):
                     x = col * (self.originalPixmap.width() // gridSize)
                     y = row * (self.originalPixmap.height() // gridSize)
                     piecePixmap = self.originalPixmap.copy(
@@ -181,12 +188,12 @@ class PuzzleGame(QMainWindow):
                 else:
                     piece.setStyleSheet("background-color: white;")
                 piece.setScaledContents(True)
-                piece.mousePressEvent = lambda event, r=row, c=col: self.movePiece(r, c)
+                piece.mousePressEvent = lambda event, p=piece: self.movePiece(p.row, p.col)
                 self.puzzleLayout.addWidget(piece, row, col)
                 self.puzzlePieces[row][col] = piece
                 self.piecePositions.append((row, col))
 
-        self.shufflePuzzle()
+        # self.shufflePuzzle()
 
     def clearLayout(self, layout):
         if layout is not None:
@@ -218,13 +225,14 @@ class PuzzleGame(QMainWindow):
     def shufflePuzzle(self):
         positions = [(r, c) for r in range(self.gridSideNumber) for c in range(self.gridSideNumber)]
         positions.remove(self.emptyPosition)
-        random.shuffle(positions)  # 随机打乱拼图块
+        random.shuffle(positions)
         positions.append(self.emptyPosition)
 
         for idx, (row, col) in enumerate(positions):
             newRow, newCol = divmod(idx, self.gridSideNumber)
             piece = self.puzzlePieces[row][col]
             self.puzzleLayout.addWidget(piece, newRow, newCol)
+            piece.row, piece.col = newRow, newCol
             if (row, col) == self.emptyPosition:
                 self.emptyPosition = (newRow, newCol)
 
@@ -234,18 +242,19 @@ class PuzzleGame(QMainWindow):
         emptyRow, emptyCol = self.emptyPosition
         if self.isAdjacent(row, col, emptyRow, emptyCol):
             # 交换拼图块
-            temp = self.puzzlePieces[row][col]
-            self.puzzlePieces[row][col] = self.puzzlePieces[emptyRow][emptyCol]
-            self.puzzlePieces[emptyRow][emptyCol] = temp
+            pieceA = self.puzzlePieces[row][col]
+            pieceB = self.puzzlePieces[emptyRow][emptyCol]
+            self.puzzlePieces[row][col], self.puzzlePieces[emptyRow][emptyCol] = pieceB, pieceA
 
             # 更新布局
-            self.puzzleLayout.addWidget(self.puzzlePieces[emptyRow][emptyCol], emptyRow, emptyCol)
-            self.puzzleLayout.addWidget(self.puzzlePieces[row][col], row, col)
+            self.puzzleLayout.addWidget(pieceA, emptyRow, emptyCol)
+            self.puzzleLayout.addWidget(pieceB, row, col)
 
             # 更新位置信息
-            clickedPieceIndex = self.piecePositions.index((row, col))
-            self.piecePositions[clickedPieceIndex] = (emptyRow, emptyCol)
-            self.piecePositions[-1] = (row, col)
+            pieceA.row, pieceA.col = emptyRow, emptyCol
+            pieceB.row, pieceB.col = row, col
+
+            # 更新空白位置
             self.emptyPosition = (row, col)
 
             # 检查是否完成拼图
@@ -276,10 +285,11 @@ class PuzzleGame(QMainWindow):
         self.createPuzzle(self.gridSideNumber)
 
     def isSolved(self):
-        for i, pos in enumerate(self.piecePositions):
-            expected_pos = divmod(i, self.gridSideNumber)
-            if pos != expected_pos:
-                return False
+        for row in range(self.gridSideNumber):
+            for col in range(self.gridSideNumber):
+                piece = self.puzzlePieces[row][col]
+                if piece.row != row or piece.col != col:
+                    return False
         return True
 
     def setDifficulty(self, difficulty):
