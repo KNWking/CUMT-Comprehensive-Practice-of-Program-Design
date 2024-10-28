@@ -263,6 +263,10 @@ class PuzzleGame(QMainWindow):
             if old_pos == self.emptyPosition:
                 self.emptyPosition = (new_row, new_col)
 
+        while self.isSolved():
+            # 如果恰好打乱后就是解决状态，则再次打乱
+            self.shufflePuzzle()
+
         # 更新puzzlePieces
         self.puzzlePieces = new_puzzlePieces
 
@@ -337,24 +341,41 @@ class PuzzleGame(QMainWindow):
                     return False
         return True
 
-    def setDifficulty(self, difficulty):
+    def setDifficulty(self):
+        difficulty = self.difficultyComboBox.currentText()
         if difficulty == "容易":
-            self.gridSideNumber = 3
+            self.gridSideNumber = 2
         elif difficulty == "中等":
-            self.gridSideNumber = 4
+            self.gridSideNumber = 3
         elif difficulty == "困难":
-            self.gridSideNumber = 5
+            self.gridSideNumber = 4
         else:
-            self.gridSideNumber = int(difficulty)
-
-        self.gridSpinBox.setValue(self.gridSideNumber)
-        self.createPuzzle(self.gridSideNumber)
+            # 如果难度不是预设的三个选项，就假设它是一个数字
+            try:
+                self.gridSideNumber = int(difficulty)
+            except ValueError:
+                # 如果转换失败，使用默认值
+                self.gridSideNumber = 3
 
     def startChallenge(self):
-        self.timeLeft = 60  # 设置挑战时间（秒）
+        self.setDifficulty()
+        self.gridSpinBox.setValue(self.gridSideNumber)
+        self.createPuzzle(self.gridSideNumber)
+        difficulty = self.difficultyComboBox.currentText()
+        if difficulty == "容易":
+            self.timeLeft = 3000
+        elif difficulty == "中等":
+            self.timeLeft = 6000
+        elif difficulty == "困难":
+            self.timeLeft = 9000
+        else:
+            # 默认时间
+            self.timeLeft = 60
+
         self.timer.start(1000)  # 每秒更新一次
         self.shufflePuzzle()
         self.challengeButton.setEnabled(False)
+        self.timerLabel.setText(f"时间: {self.timeLeft}")
 
     def updateTimer(self):
         self.timeLeft -= 1
