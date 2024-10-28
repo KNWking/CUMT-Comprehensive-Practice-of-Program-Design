@@ -167,18 +167,26 @@ class PuzzleGame(QMainWindow):
         self.gridSideNumber = gridSize
         self.puzzleLayout.setSpacing(0)
         self.clearLayout(self.puzzleLayout)
+
+        # 计算每个拼图块的大小
         pieceWidth = self.puzzleContainer.width() // self.gridSideNumber
         pieceHeight = self.puzzleContainer.height() // self.gridSideNumber
+
+        # 初始化拼图块和位置数组
         self.puzzlePieces = [[None for _ in range(gridSize)] for _ in range(gridSize)]
-        self.piecePositions = []
+        self.piecePositions = [[None for _ in range(gridSize)] for _ in range(gridSize)]
+
+        # 设置空白位置为右下角
         self.emptyPosition = (gridSize - 1, gridSize - 1)
 
         for row in range(gridSize):
             for col in range(gridSize):
                 piece = PuzzlePiece(row, col)
                 piece.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-                piece.setMinimumSize(1, 1)
-                if not (row == gridSize - 1 and col == gridSize - 1):
+                piece.setMinimumSize(1, 1)  # 允许缩小到最小1x1像素
+
+                if (row, col) != self.emptyPosition:
+                    # 计算原图中对应的区域
                     x = col * (self.originalPixmap.width() // gridSize)
                     y = row * (self.originalPixmap.height() // gridSize)
                     piecePixmap = self.originalPixmap.copy(
@@ -187,13 +195,16 @@ class PuzzleGame(QMainWindow):
                                                        Qt.TransformationMode.SmoothTransformation))
                 else:
                     piece.setStyleSheet("background-color: white;")
+
                 piece.setScaledContents(True)
                 piece.mousePressEvent = lambda event, p=piece: self.movePiece(p.row, p.col)
+
                 self.puzzleLayout.addWidget(piece, row, col)
                 self.puzzlePieces[row][col] = piece
-                self.piecePositions.append((row, col))
+                self.piecePositions[row][col] = (row, col)
 
-        # self.shufflePuzzle()
+        # 打乱拼图
+        self.shufflePuzzle()
 
     def clearLayout(self, layout):
         if layout is not None:
@@ -223,20 +234,37 @@ class PuzzleGame(QMainWindow):
         dialog.exec()
 
     def shufflePuzzle(self):
-        positions = [(r, c) for r in range(self.gridSideNumber) for c in range(self.gridSideNumber)]
-        positions.remove(self.emptyPosition)
+        # 创建所有位置的列表，除了空白位置
+        positions = [(r, c) for r in range(self.gridSideNumber) for c in range(self.gridSideNumber) if
+                     (r, c) != self.emptyPosition]
+
+        # 随机打乱非空白位置
         random.shuffle(positions)
+
+        # 将空白位置添加到列表末尾
         positions.append(self.emptyPosition)
 
-        for idx, (row, col) in enumerate(positions):
-            newRow, newCol = divmod(idx, self.gridSideNumber)
-            piece = self.puzzlePieces[row][col]
-            self.puzzleLayout.addWidget(piece, newRow, newCol)
-            piece.row, piece.col = newRow, newCol
-            if (row, col) == self.emptyPosition:
-                self.emptyPosition = (newRow, newCol)
+        # 创建一个新的puzzlePieces数组来存储重新排列后的拼图块
+        new_puzzlePieces = [[None for _ in range(self.gridSideNumber)] for _ in range(self.gridSideNumber)]
 
-        self.piecePositions = positions
+        for new_pos, old_pos in enumerate(positions):
+            new_row, new_col = divmod(new_pos, self.gridSideNumber)
+            old_row, old_col = old_pos
+
+            piece = self.puzzlePieces[old_row][old_col]
+            new_puzzlePieces[new_row][new_col] = piece
+
+            if piece is not None:
+                piece.row, piece.col = new_row, new_col
+                self.puzzleLayout.addWidget(piece, new_row, new_col)
+
+            self.piecePositions[new_row][new_col] = old_pos
+
+            if old_pos == self.emptyPosition:
+                self.emptyPosition = (new_row, new_col)
+
+        # 更新puzzlePieces
+        self.puzzlePieces = new_puzzlePieces
 
     def movePiece(self, row, col):
         emptyRow, emptyCol = self.emptyPosition
@@ -253,6 +281,10 @@ class PuzzleGame(QMainWindow):
             # 更新位置信息
             pieceA.row, pieceA.col = emptyRow, emptyCol
             pieceB.row, pieceB.col = row, col
+
+            # 更新 piecePositions
+            self.piecePositions[row][col], self.piecePositions[emptyRow][emptyCol] = \
+                self.piecePositions[emptyRow][emptyCol], self.piecePositions[row][col]
 
             # 更新空白位置
             self.emptyPosition = (row, col)
@@ -287,8 +319,7 @@ class PuzzleGame(QMainWindow):
     def isSolved(self):
         for row in range(self.gridSideNumber):
             for col in range(self.gridSideNumber):
-                piece = self.puzzlePieces[row][col]
-                if piece.row != row or piece.col != col:
+                if self.piecePositions[row][col] != (row, col):
                     return False
         return True
 
