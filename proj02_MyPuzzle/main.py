@@ -257,11 +257,11 @@ class PuzzleGame(QMainWindow):
                     QMessageBox.information(self, '恭喜', '拼图完成!')
 
     def isAdjacent(self, row1, col1, row2, col2):
-        # 检查行列差的绝对值
-        row_diff = abs(row1 - row2)
-        col_diff = abs(col1 - col2)
-        # 如果行列差的绝对值都不超过1，则表示元素相邻
-        return row_diff <= 1 and col_diff <= 1 and (row_diff != 0 or col_diff != 0)
+        if row1 == row2 and abs(col1 - col2) == 1:
+            return True
+        if col1 == col2 and abs(row1 - row2) == 1:
+            return True
+        return False
 
     def changeImage(self):
         options = QFileDialog.Options()
