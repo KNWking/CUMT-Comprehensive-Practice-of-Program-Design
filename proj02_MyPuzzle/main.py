@@ -137,7 +137,7 @@ class PuzzleGame(QMainWindow):
         mainLayout.addLayout(self.controlPanel, 1)  # 控制面板占1份
 
         self.loadImage('example_image.jpg')
-        self.createPuzzle(self.gridSideNumber)
+        QTimer.singleShot(0, lambda: self.createPuzzle(self.gridSideNumber))
 
     def loadImageList(self, folder):
         return [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(('.png', '.jpg', '.bmp'))]
@@ -306,12 +306,26 @@ class PuzzleGame(QMainWindow):
         return False
 
     def changeImage(self):
-        options = QFileDialog.Options()
         fileName, _ = QFileDialog.getOpenFileName(self, "选择图片", "",
-                                                  "Images (*.png *.jpg *.bmp);;All Files (*)", options=options)
+                                                  "Images (*.png *.jpg *.bmp);;All Files (*)")
         if fileName:
-            self.loadImage(fileName)
-            self.createPuzzle(self.gridSideNumber)
+            try:
+                # 尝试加载新图片
+                new_image = QImage(fileName)
+                if new_image.isNull():
+                    raise Exception("无法加载图片")
+
+                # 如果成功加载，更新当前图片
+                self.img = new_image
+                self.originalPixmap = QPixmap.fromImage(self.img)
+
+                # 重新创建拼图
+                self.createPuzzle(self.gridSideNumber)
+            except Exception as e:
+                QMessageBox.critical(self, "错误", f"加载图片时出错: {str(e)}")
+        else:
+            # 用户取消了选择，不做任何操作
+            pass
 
     def solvePuzzle(self):
         self.createPuzzle(self.gridSideNumber)
