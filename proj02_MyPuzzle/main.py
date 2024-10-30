@@ -66,6 +66,10 @@ class PuzzleGame(QMainWindow):
         self.timer.timeout.connect(self.updateTimer)
         self.timeLeft = 0
         self.original_image_dialog = None
+        self.challengeTime = 0
+        self.EASY = 30
+        self.MEDIUM = 90
+        self.HARD = 360
 
     def initUI(self):
         self.setWindowTitle('myPuzzle')
@@ -302,7 +306,7 @@ class PuzzleGame(QMainWindow):
             if self.isSolved():
                 if self.timer.isActive():
                     self.timer.stop()
-                    QMessageBox.information(self, '恭喜', f'拼图完成! 用时: {60 - self.timeLeft} 秒')
+                    QMessageBox.information(self, '恭喜', f'拼图完成! 用时: {self.challengeTime - self.timeLeft} 秒')
                     self.challengeButton.setEnabled(True)
                 else:
                     QMessageBox.information(self, '恭喜', '拼图完成!')
@@ -368,17 +372,21 @@ class PuzzleGame(QMainWindow):
         self.createPuzzle(self.gridSideNumber)
         difficulty = self.difficultyComboBox.currentText()
         if difficulty == "容易":
-            self.timeLeft = 3000
+            self.timeLeft = self.EASY
+            self.challengeTime = self.EASY
         elif difficulty == "中等":
-            self.timeLeft = 6000
+            self.timeLeft = self.MEDIUM
+            self.challengeTime = self.MEDIUM
         elif difficulty == "困难":
-            self.timeLeft = 9000
+            self.timeLeft = self.HARD
+            self.challengeTime = self.HARD
         else:
             # 默认时间
-            self.timeLeft = 60
+            self.timeLeft = self.MEDIUM
+            self.challengeTime = self.MEDIUM
 
         self.timer.start(1000)  # 每秒更新一次
-        self.shufflePuzzle()
+        self.createPuzzle(self.gridSideNumber)
         self.challengeButton.setEnabled(False)
         self.timerLabel.setText(f"时间: {self.timeLeft}")
 
