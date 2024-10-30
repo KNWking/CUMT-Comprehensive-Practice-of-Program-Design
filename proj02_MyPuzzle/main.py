@@ -65,6 +65,7 @@ class PuzzleGame(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateTimer)
         self.timeLeft = 0
+        self.original_image_dialog = None
 
     def initUI(self):
         self.setWindowTitle('myPuzzle')
@@ -100,9 +101,6 @@ class PuzzleGame(QMainWindow):
         self.viewOriginalButton = QPushButton("查看原图")
         self.viewOriginalButton.clicked.connect(self.viewOriginalImage)
 
-        self.shuffleButton = QPushButton("试玩新图")
-        self.shuffleButton.clicked.connect(self.shufflePuzzle)
-
         self.changeImageButton = QPushButton("切换图片")
         self.changeImageButton.clicked.connect(self.changeImage)
 
@@ -123,7 +121,6 @@ class PuzzleGame(QMainWindow):
         self.timerLabel = QLabel("时间: 0", self)
 
         self.controlPanel.addWidget(self.viewOriginalButton)
-        self.controlPanel.addWidget(self.shuffleButton)
         self.controlPanel.addWidget(self.changeImageButton)
         self.controlPanel.addWidget(self.solvePuzzleButton)
         self.controlPanel.addWidget(self.randomImageButton)
@@ -219,6 +216,10 @@ class PuzzleGame(QMainWindow):
         self.createPuzzle(newSize)
 
     def viewOriginalImage(self):
+        # 如果原图框已经打开，关闭。
+        if self.original_image_dialog is not None and self.original_image_dialog.isVisible():
+            self.original_image_dialog.close()
+
         dialog = ViewOriginalDialog(self, self.originalPixmap)
         dialog.setMinimumSize(100, int(100 / dialog.aspectRatio))
 
@@ -231,7 +232,11 @@ class PuzzleGame(QMainWindow):
         )
         dialog.move(dialog_position)
 
-        dialog.exec()
+        # 将 exec() 改为 show()
+        dialog.show()
+
+        # 保持对话框的引用，防止被垃圾回收
+        self.original_image_dialog = dialog
 
     def shufflePuzzle(self):
         # 创建所有位置的列表，除了空白位置
