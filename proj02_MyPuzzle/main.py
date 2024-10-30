@@ -121,6 +121,9 @@ class PuzzleGame(QMainWindow):
 
         self.challengeButton = QPushButton("开始挑战")
         self.challengeButton.clicked.connect(self.startChallenge)
+        self.stopChallengeButton = QPushButton("停止挑战")
+        self.stopChallengeButton.clicked.connect(self.stopChallenge)
+        self.stopChallengeButton.setEnabled(False)
 
         self.timerLabel = QLabel("时间: 0", self)
 
@@ -131,6 +134,7 @@ class PuzzleGame(QMainWindow):
         self.controlPanel.addWidget(self.difficultyLabel)
         self.controlPanel.addWidget(self.difficultyComboBox)
         self.controlPanel.addWidget(self.challengeButton)
+        self.controlPanel.addWidget(self.stopChallengeButton)
         self.controlPanel.addWidget(self.timerLabel)
 
         mainLayout = QHBoxLayout(centralWidget)
@@ -306,8 +310,9 @@ class PuzzleGame(QMainWindow):
             if self.isSolved():
                 if self.timer.isActive():
                     self.timer.stop()
-                    QMessageBox.information(self, '恭喜', f'拼图完成! 用时: {self.challengeTime - self.timeLeft} 秒')
                     self.challengeButton.setEnabled(True)
+                    self.stopChallengeButton.setEnabled(False)
+                    QMessageBox.information(self, '恭喜', f'拼图完成! 用时: {self.challengeTime - self.timeLeft} 秒')
                 else:
                     QMessageBox.information(self, '恭喜', '拼图完成!')
 
@@ -388,15 +393,24 @@ class PuzzleGame(QMainWindow):
         self.timer.start(1000)  # 每秒更新一次
         self.createPuzzle(self.gridSideNumber)
         self.challengeButton.setEnabled(False)
+        self.stopChallengeButton.setEnabled(True)
         self.timerLabel.setText(f"时间: {self.timeLeft}")
+
+    def stopChallenge(self):
+        self.timer.stop()
+        self.challengeButton.setEnabled(True)
+        self.stopChallengeButton.setEnabled(False)
+        self.timerLabel.setText("时间: 0")
+        QMessageBox.information(self, '挑战结束', '挑战已停止')
 
     def updateTimer(self):
         self.timeLeft -= 1
         self.timerLabel.setText(f"时间: {self.timeLeft}")
         if self.timeLeft <= 0:
             self.timer.stop()
-            QMessageBox.information(self, '挑战失败', '时间到！')
             self.challengeButton.setEnabled(True)
+            self.stopChallengeButton.setEnabled(False)
+            QMessageBox.information(self, '挑战失败', '时间到！')
 
 
 if __name__ == '__main__':
