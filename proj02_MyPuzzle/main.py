@@ -247,41 +247,70 @@ class PuzzleGame(QMainWindow):
         self.original_image_dialog = dialog
 
     def shufflePuzzle(self):
-        # 创建所有位置的列表，除了空白位置
-        positions = [(r, c) for r in range(self.gridSideNumber) for c in range(self.gridSideNumber) if
-                     (r, c) != self.emptyPosition]
+        n = self.gridSideNumber
+        puzzle = list(range(n * n))
+        random.shuffle(puzzle)  # 直接随机打乱
 
-        # 随机打乱非空白位置
-        random.shuffle(positions)
+        # 确保空格在正确位置
+        blank_index = puzzle.index(0)
+        if blank_index != n * n - 1:
+            puzzle[blank_index], puzzle[-1] = puzzle[-1], puzzle[blank_index]
 
-        # 将空白位置添加到列表末尾
-        positions.append(self.emptyPosition)
+        # 计算逆序数
+        inversions = self.countInversions(puzzle)
 
-        # 创建一个新的puzzlePieces数组来存储重新排列后的拼图块
-        new_puzzlePieces = [[None for _ in range(self.gridSideNumber)] for _ in range(self.gridSideNumber)]
+        # 检查可解性
+        if n % 2 == 1:
+            is_solvable = inversions % 2 == 0
+        else:
+            blank_row = n - 1  # 空格总是在最后一行
+            is_solvable = (inversions + blank_row) % 2 == 1
 
-        for new_pos, old_pos in enumerate(positions):
-            new_row, new_col = divmod(new_pos, self.gridSideNumber)
-            old_row, old_col = old_pos
+        if not is_solvable:
+            # 如果不可解，交换前两个非空白格
+            i = 0
+            while puzzle[i] == 0:
+                i += 1
+            j = i + 1
+            while puzzle[j] == 0:
+                j += 1
+            puzzle[i], puzzle[j] = puzzle[j], puzzle[i]
 
-            piece = self.puzzlePieces[old_row][old_col]
-            new_puzzlePieces[new_row][new_col] = piece
+        # 更新拼图
+        self.updatePuzzleFromList(puzzle)
 
-            if piece is not None:
-                piece.row, piece.col = new_row, new_col
-                self.puzzleLayout.addWidget(piece, new_row, new_col)
+    def countInversions(self, puzzle):
+        inversions = 0
+        for i in range(len(puzzle) - 1):
+            for j in range(i + 1, len(puzzle)):
+                if puzzle[i] > puzzle[j] and puzzle[j] != 0:
+                    inversions += 1
+        return inversions
 
-            self.piecePositions[new_row][new_col] = old_pos
+    def updatePuzzleFromList(self, puzzle):
+        n = self.gridSideNumber
+        for i in range(n * n):
+            row, col = divmod(i, n)
+            value = puzzle[i]
+            original_row, original_col = divmod(value, n)  # 移到这里，对所有块都计算
 
-            if old_pos == self.emptyPosition:
-                self.emptyPosition = (new_row, new_col)
+            piece = self.puzzlePieces[row][col]
+            if value == 0:
+                self.emptyPosition = (row, col)
+                piece.clear()
+                piece.setStyleSheet("background-color: white;")
+            else:
+                x = original_col * (self.originalPixmap.width() // n)
+                y = original_row * (self.originalPixmap.height() // n)
+                piecePixmap = self.originalPixmap.copy(
+                    QRect(x, y, self.originalPixmap.width() // n, self.originalPixmap.height() // n))
+                piece.setPixmap(piecePixmap.scaled(piece.width(), piece.height(), Qt.AspectRatioMode.KeepAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation))
 
-        while self.isSolved():
-            # 如果恰好打乱后就是解决状态，则再次打乱
-            self.shufflePuzzle()
-
-        # 更新puzzlePieces
-        self.puzzlePieces = new_puzzlePieces
+            self.puzzlePieces[row][col] = piece
+            self.piecePositions[row][col] = (original_row, original_col)
+            piece.row, piece.col = row, col
+            self.puzzleLayout.addWidget(piece, row, col)
 
     def movePiece(self, row, col):
         emptyRow, emptyCol = self.emptyPosition
