@@ -249,41 +249,54 @@ class PuzzleGame(QMainWindow):
     def shufflePuzzle(self):
         n = self.gridSideNumber
         puzzle = list(range(n * n))
-        random.shuffle(puzzle)  # 直接随机打乱
+        attempts = 0
+        while True:
+            attempts += 1
+            random.shuffle(puzzle)
+            inversions = self.countInversions(puzzle)
+            blank_index = puzzle.index(0)
+            blank_row = blank_index // n
+            blank_col = blank_index % n
 
-        # 确保空格在正确位置
-        blank_index = puzzle.index(0)
-        if blank_index != n * n - 1:
-            puzzle[blank_index], puzzle[-1] = puzzle[-1], puzzle[blank_index]
+            print(f"Attempt {attempts}:")
+            print(f"Puzzle: {puzzle}")
+            print(f"Inversions: {inversions}")
+            print(f"Blank position: row {blank_row}, col {blank_col}")
 
-        # 计算逆序数
-        inversions = self.countInversions(puzzle)
+            if n % 2 == 1:
+                is_solvable = inversions % 2 == 0
+            else:
+                is_solvable = (inversions + blank_row) % 2 == 0  # 注意这里改成了 == 0
 
-        # 检查可解性
-        if n % 2 == 1:
-            is_solvable = inversions % 2 == 0
-        else:
-            blank_row = n - 1  # 空格总是在最后一行
-            is_solvable = (inversions + blank_row) % 2 == 1
+            print(f"Is solvable: {is_solvable}")
 
-        if not is_solvable:
-            # 如果不可解，交换前两个非空白格
-            i = 0
-            while puzzle[i] == 0:
-                i += 1
-            j = i + 1
-            while puzzle[j] == 0:
-                j += 1
-            puzzle[i], puzzle[j] = puzzle[j], puzzle[i]
+            if is_solvable:
+                break
 
-        # 更新拼图
+            if attempts > 1000:
+                print("Exceeded maximum attempts, forcing a solvable puzzle.")
+                if n % 2 == 1:
+                    while inversions % 2 != 0:
+                        random.shuffle(puzzle)
+                        inversions = self.countInversions(puzzle)
+                else:
+                    while (inversions + blank_row) % 2 != 0:  # 这里也改成了 != 0
+                        random.shuffle(puzzle)
+                        inversions = self.countInversions(puzzle)
+                        blank_index = puzzle.index(0)
+                        blank_row = blank_index // n
+                break
+
+        print(f"Final puzzle: {puzzle}")
+        print(f"Final inversions: {inversions}")
+        print(f"Final blank position: row {blank_row}, col {blank_col}")
         self.updatePuzzleFromList(puzzle)
 
     def countInversions(self, puzzle):
         inversions = 0
         for i in range(len(puzzle) - 1):
             for j in range(i + 1, len(puzzle)):
-                if puzzle[i] > puzzle[j] and puzzle[j] != 0:
+                if puzzle[i] > puzzle[j] and puzzle[i] != 0 and puzzle[j] != 0:
                     inversions += 1
         return inversions
 
