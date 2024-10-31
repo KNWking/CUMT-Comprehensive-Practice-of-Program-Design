@@ -88,54 +88,62 @@ class PuzzleGame(QMainWindow):
 
         self.controlPanel = QVBoxLayout()
         self.controlPanel.setSpacing(10)
-        self.gridLayout = QHBoxLayout()
 
+        self.gridLayout = QHBoxLayout()
         spinBoxLabel = QLabel("图片切割数量 (单位边):")
         self.gridSpinBox = QSpinBox()
         self.gridSpinBox.setMinimum(2)
         self.gridSpinBox.setMaximum(10)
         self.gridSpinBox.setValue(self.gridSideNumber)
         self.gridSpinBox.valueChanged.connect(self.updateGridSize)
-
         self.gridLayout.addWidget(spinBoxLabel)
         self.gridLayout.addWidget(self.gridSpinBox)
-
         self.controlPanel.addLayout(self.gridLayout)
 
         self.viewOriginalButton = QPushButton("查看原图")
         self.viewOriginalButton.clicked.connect(self.viewOriginalImage)
+        self.controlPanel.addWidget(self.viewOriginalButton)
 
         self.changeImageButton = QPushButton("切换图片")
         self.changeImageButton.clicked.connect(self.changeImage)
+        self.controlPanel.addWidget(self.changeImageButton)
 
         self.solvePuzzleButton = QPushButton("图片重排")
         self.solvePuzzleButton.clicked.connect(self.solvePuzzle)
+        self.controlPanel.addWidget(self.solvePuzzleButton)
 
         self.randomImageButton = QPushButton("随机图片")
         self.randomImageButton.clicked.connect(self.randomImage)
+        self.controlPanel.addWidget(self.randomImageButton)
 
+        self.controlPanel.addSpacing(40)  # 在难度选择之前添加间距
+
+        # 创建一个水平布局来放置难度标签和选择框
+        difficultyLayout = QHBoxLayout()
         self.difficultyLabel = QLabel("难度:")
         self.difficultyComboBox = QComboBox()
         self.difficultyComboBox.addItems(["容易", "中等", "困难"])
         self.difficultyComboBox.currentTextChanged.connect(self.setDifficulty)
+        difficultyLayout.addWidget(self.difficultyLabel)
+        difficultyLayout.addWidget(self.difficultyComboBox)
+        self.controlPanel.addLayout(difficultyLayout)
 
+        # 创建一个水平布局来放置挑战按钮
+        challengeLayout = QHBoxLayout()
         self.challengeButton = QPushButton("开始挑战")
         self.challengeButton.clicked.connect(self.startChallenge)
         self.stopChallengeButton = QPushButton("停止挑战")
         self.stopChallengeButton.clicked.connect(self.stopChallenge)
         self.stopChallengeButton.setEnabled(False)
+        challengeLayout.addWidget(self.challengeButton)
+        challengeLayout.addWidget(self.stopChallengeButton)
+        self.controlPanel.addLayout(challengeLayout)
 
         self.timerLabel = QLabel("时间: 0", self)
-
-        self.controlPanel.addWidget(self.viewOriginalButton)
-        self.controlPanel.addWidget(self.changeImageButton)
-        self.controlPanel.addWidget(self.solvePuzzleButton)
-        self.controlPanel.addWidget(self.randomImageButton)
-        self.controlPanel.addWidget(self.difficultyLabel)
-        self.controlPanel.addWidget(self.difficultyComboBox)
-        self.controlPanel.addWidget(self.challengeButton)
-        self.controlPanel.addWidget(self.stopChallengeButton)
         self.controlPanel.addWidget(self.timerLabel)
+
+        # 可以添加一些空白来调整其他控件的间距
+        self.controlPanel.addStretch(1)
 
         mainLayout = QHBoxLayout(centralWidget)
         mainLayout.addWidget(self.puzzleContainer, 4)  # 拼图区域占4份
