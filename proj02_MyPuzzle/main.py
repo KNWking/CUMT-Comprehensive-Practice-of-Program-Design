@@ -6,6 +6,9 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QVBoxLayout
                              QDialog)
 from PyQt6.QtGui import QPixmap, QImage, QResizeEvent
 from PyQt6.QtCore import Qt, QRect, QSize, QTimer, QPoint
+from qfluentwidgets import (PushButton, ComboBox, FluentIcon as FIF,
+                            PrimaryPushButton, setFont, FluentIcon,
+                            MessageBox, MessageBoxBase, SubtitleLabel, TitleLabel, ImageLabel, BodyLabel)
 
 
 # 查看原图的对话框
@@ -100,19 +103,19 @@ class PuzzleGame(QMainWindow):
         self.gridLayout.addWidget(self.gridSpinBox)
         self.controlPanel.addLayout(self.gridLayout)
 
-        self.viewOriginalButton = QPushButton("查看原图")
+        self.viewOriginalButton = PushButton(FluentIcon.PHOTO, "查看原图", self)
         self.viewOriginalButton.clicked.connect(self.viewOriginalImage)
         self.controlPanel.addWidget(self.viewOriginalButton)
 
-        self.changeImageButton = QPushButton("切换图片")
+        self.changeImageButton = PushButton("切换图片", self)
         self.changeImageButton.clicked.connect(self.changeImage)
         self.controlPanel.addWidget(self.changeImageButton)
 
-        self.solvePuzzleButton = QPushButton("图片重排")
+        self.solvePuzzleButton = PushButton("图片重排", self)
         self.solvePuzzleButton.clicked.connect(self.solvePuzzle)
         self.controlPanel.addWidget(self.solvePuzzleButton)
 
-        self.randomImageButton = QPushButton("随机图片")
+        self.randomImageButton = PushButton("随机图片", self)
         self.randomImageButton.clicked.connect(self.randomImage)
         self.controlPanel.addWidget(self.randomImageButton)
 
@@ -130,9 +133,9 @@ class PuzzleGame(QMainWindow):
 
         # 创建一个水平布局来放置挑战按钮
         challengeLayout = QHBoxLayout()
-        self.challengeButton = QPushButton("开始挑战")
+        self.challengeButton = PrimaryPushButton("开始挑战", self)
         self.challengeButton.clicked.connect(self.startChallenge)
-        self.stopChallengeButton = QPushButton("停止挑战")
+        self.stopChallengeButton = PushButton("停止挑战")
         self.stopChallengeButton.clicked.connect(self.stopChallenge)
         self.stopChallengeButton.setEnabled(False)
         challengeLayout.addWidget(self.challengeButton)
