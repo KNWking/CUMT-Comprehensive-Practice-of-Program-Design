@@ -113,11 +113,25 @@ class CustomTitleBar(MSFluentTitleBar):
 
         file_menu = RoundMenu("文件", self)
 
-        new_action = Action(FIF.COPY, "复制")
+        copy_action = Action(FIF.COPY, "复制")
+        copy_action.triggered.connect(parent.copy_text)
+        file_menu.addAction(copy_action)
 
-        new_action = Action(FIF.PASTE, "粘贴")
+        paste_action = Action(FIF.PASTE, "粘贴")
+        paste_action.triggered.connect(parent.paste_text)
+        file_menu.addAction(paste_action)
 
-        new_action = Action(FIF.PASTE, "粘贴")
+        cut_action = Action(FIF.CUT, "剪切")
+        cut_action.triggered.connect(parent.cut_text)
+        file_menu.addAction(cut_action)
+
+        undo_action = Action(FIF.CANCEL, "撤销")
+        undo_action.triggered.connect(parent.undo_action)
+        file_menu.addAction(undo_action)
+
+        redo_action = Action(FIF.HISTORY, "重做")
+        redo_action.triggered.connect(parent.redo_action)
+        file_menu.addAction(redo_action)
 
         file_menu.addSeparator()
 
@@ -256,6 +270,26 @@ class Window(MSFluentWindow):
         if current_tab and isinstance(current_tab, TabInterface):
             # 更新当前的 TWidget
             self.current_editor = self.text_widgets[current_tab.objectName()]
+
+    def copy_text(self):
+        if self.current_editor:
+            self.current_editor.copy()
+
+    def paste_text(self):
+        if self.current_editor:
+            self.current_editor.paste()
+
+    def cut_text(self):
+        if self.current_editor:
+            self.current_editor.cut()
+
+    def undo_action(self):
+        if self.current_editor:
+            self.current_editor.undo()
+
+    def redo_action(self):
+        if self.current_editor:
+            self.current_editor.redo()
 
     def onTabAddRequested(self):
         text = f'Glyph {self.tabBar.count() + 1}'
