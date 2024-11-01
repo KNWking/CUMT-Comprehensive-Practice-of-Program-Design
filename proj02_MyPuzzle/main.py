@@ -145,7 +145,7 @@ class PuzzleGame(QMainWindow):
         challengeLayout.addWidget(self.stopChallengeButton)
         self.controlPanel.addLayout(challengeLayout)
 
-        self.timerLabel = QLabel("时间: 0", self)
+        self.timerLabel = BodyLabel("剩余时间: 0", self)
         self.controlPanel.addWidget(self.timerLabel)
 
         # 可以添加一些空白来调整其他控件的间距
