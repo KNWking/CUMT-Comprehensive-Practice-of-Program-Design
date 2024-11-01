@@ -112,6 +112,15 @@ class CustomTitleBar(MSFluentTitleBar):
         self.menu.setStyleSheet("QMenu{color : red;}")
 
         file_menu = RoundMenu("文件", self)
+
+        new_action = Action(FIF.COPY, "复制")
+
+        new_action = Action(FIF.PASTE, "粘贴")
+
+        new_action = Action(FIF.PASTE, "粘贴")
+
+        file_menu.addSeparator()
+
         new_action = Action(FIF.ADD, "新建")
         new_action.triggered.connect(parent.onTabAddRequested)
         file_menu.addAction(new_action)
@@ -119,8 +128,6 @@ class CustomTitleBar(MSFluentTitleBar):
         open_action = Action(FIF.SEND_FILL, "打开")
         open_action.triggered.connect(parent.open_document)
         file_menu.addAction(open_action)
-
-        file_menu.addSeparator()
 
         save_action = Action(FIF.SAVE, "保存")
         save_action.triggered.connect(parent.save_document)
@@ -220,11 +227,15 @@ class Window(MSFluentWindow):
 
     def showMessageBox(self):
         w = MessageBox(
-            'Notes(1) 📝',
+            'SimpleMDIExample 📝',
             (
                     "Version : 1.0"
-                    + "\n" + "\n" + "\n" + "💝  I hope you'll enjoy using notes(1) as much as I did while coding it  💝" + "\n" + "\n" + "\n" +
-                    "Made with 💖 By Rohan Kishore"
+                    + "\n" + "\n" + "\n"
+                    + " CUMT 程序设计综合实践作业"
+                    + "\n" + "\n"
+                    + "相关库：PyQt6、QFluentWidgets (https://qfluentwidgets.com/)"
+                    + "\n" + "\n" + "\n" +
+                    "By KNWking"
             ),
             self
         )
@@ -232,7 +243,7 @@ class Window(MSFluentWindow):
         w.cancelButton.setText('Return')
 
         if w.exec():
-            QDesktopServices.openUrl(QUrl("https://github.com/rohankishore/"))
+            QDesktopServices.openUrl(QUrl("https://github.com/KNWking/"))
 
     def onTabChanged(self, index: int):
         objectName = self.tabBar.currentTab().routeKey()
