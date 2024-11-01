@@ -4,11 +4,11 @@ import random
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QVBoxLayout, QHBoxLayout, QMessageBox,
                              QLabel, QPushButton, QWidget, QSpinBox, QFrame, QFileDialog, QComboBox, QSizePolicy,
                              QDialog)
-from PyQt6.QtGui import QPixmap, QImage, QResizeEvent
+from PyQt6.QtGui import QPixmap, QImage, QResizeEvent, QIcon
 from PyQt6.QtCore import Qt, QRect, QSize, QTimer, QPoint
-from qfluentwidgets import (PushButton, ComboBox, FluentIcon as FIF,
-                            PrimaryPushButton, setFont, FluentIcon,
-                            MessageBox, MessageBoxBase, SubtitleLabel, TitleLabel, ImageLabel, BodyLabel)
+from qfluentwidgets import (FluentWindow, PushButton, ComboBox, FluentIcon,
+                            PrimaryPushButton, setFont, FluentIcon, NavigationItemPosition,
+                            MessageBox, MessageBoxBase, SubtitleLabel, TitleLabel, BodyLabel, CompactSpinBox)
 
 
 # 查看原图的对话框
@@ -93,29 +93,31 @@ class PuzzleGame(QMainWindow):
         self.controlPanel.setSpacing(10)
 
         self.gridLayout = QHBoxLayout()
-        spinBoxLabel = QLabel("图片切割数量 (单位边):")
-        self.gridSpinBox = QSpinBox()
-        self.gridSpinBox.setMinimum(2)
-        self.gridSpinBox.setMaximum(10)
+
+        spinBoxLabel = BodyLabel("图片切割数量 (单位边):", self)
+        self.gridSpinBox = CompactSpinBox()
+        self.gridSpinBox.setRange(2, 10)
         self.gridSpinBox.setValue(self.gridSideNumber)
         self.gridSpinBox.valueChanged.connect(self.updateGridSize)
+
         self.gridLayout.addWidget(spinBoxLabel)
         self.gridLayout.addWidget(self.gridSpinBox)
+
         self.controlPanel.addLayout(self.gridLayout)
 
-        self.viewOriginalButton = PushButton(FluentIcon.PHOTO, "查看原图", self)
+        self.viewOriginalButton = PushButton(FluentIcon.VIEW, "查看原图", self)
         self.viewOriginalButton.clicked.connect(self.viewOriginalImage)
         self.controlPanel.addWidget(self.viewOriginalButton)
 
-        self.changeImageButton = PushButton("切换图片", self)
+        self.changeImageButton = PushButton(FluentIcon.PHOTO, "切换图片", self)
         self.changeImageButton.clicked.connect(self.changeImage)
         self.controlPanel.addWidget(self.changeImageButton)
 
-        self.solvePuzzleButton = PushButton("图片重排", self)
+        self.solvePuzzleButton = PushButton(FluentIcon.SYNC, "图片重排", self)
         self.solvePuzzleButton.clicked.connect(self.solvePuzzle)
         self.controlPanel.addWidget(self.solvePuzzleButton)
 
-        self.randomImageButton = PushButton("随机图片", self)
+        self.randomImageButton = PushButton(FluentIcon.QUESTION, "随机图片", self)
         self.randomImageButton.clicked.connect(self.randomImage)
         self.controlPanel.addWidget(self.randomImageButton)
 
@@ -123,8 +125,9 @@ class PuzzleGame(QMainWindow):
 
         # 创建一个水平布局来放置难度标签和选择框
         difficultyLayout = QHBoxLayout()
-        self.difficultyLabel = QLabel("难度:")
-        self.difficultyComboBox = QComboBox()
+
+        self.difficultyLabel = BodyLabel("难度:")
+        self.difficultyComboBox = ComboBox()
         self.difficultyComboBox.addItems(["容易", "中等", "困难"])
         self.difficultyComboBox.currentTextChanged.connect(self.setDifficulty)
         difficultyLayout.addWidget(self.difficultyLabel)
