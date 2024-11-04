@@ -384,6 +384,11 @@ class Window(MSFluentWindow):
         # 将 current_editor 设置为新添加的 TWidget
         self.current_editor = self.text_widgets[text]
 
+        # 切换到新创建的标签页
+        new_index = self.tabBar.count() - 1  # 新标签页的索引
+        self.tabBar.setCurrentIndex(new_index)
+        self.onTabChanged(new_index)  # 手动触发 onTabChanged 方法
+
     def open_document(self):
         file_path = filedialog.askopenfilename(
             title="打开文件",
@@ -400,17 +405,24 @@ class Window(MSFluentWindow):
                 # 如果存在 HTML 文件，读取 HTML 内容
                 with open(html_path, "r", encoding='utf-8') as f:
                     filedata = f.read()
-                self.addTab(os.path.basename(file_path), os.path.basename(file_path), '')
+                new_tab_name = os.path.basename(file_path)
+                self.addTab(new_tab_name, new_tab_name, '')
                 self.current_editor.setHtml(filedata)
             else:
                 # 如果不存在 HTML 文件，读取纯文本内容
                 with open(file_path, "r", encoding='utf-8') as f:
                     filedata = f.read()
-                self.addTab(os.path.basename(file_path), os.path.basename(file_path), '')
+                new_tab_name = os.path.basename(file_path)
+                self.addTab(new_tab_name, new_tab_name, '')
                 self.current_editor.setPlainText(filedata)
 
             self.current_editor.file_path = file_path
             self.current_editor.setFocus()
+
+            # 切换到新打开的文件标签页
+            new_index = self.tabBar.count() - 1  # 新标签页的索引
+            self.tabBar.setCurrentIndex(new_index)
+            self.onTabChanged(new_index)  # 手动触发 onTabChanged 方法
 
         except Exception as e:
             print(f"打开文件时发生错误: {e}")
