@@ -33,15 +33,20 @@ style_sheet = f"""
         QMenu::item::selected {{
             background-color: rgb(30, 30, 30);
         }}
+        QTextEdit {{
+        background-color: #000000;
+        color: white;
+        border: 0;
+    }}
     """
 
 
 class TWidget(QTextEdit):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.setFont(QFont("DotNess", 16))
-        self.setAcceptRichText(False)
+        self.setFont(QFont("Microsoft YaHei UI", 16))
         self.setStyleSheet("QTextEdit{background-color : #000000; color : white; border: 0;}")
+        self.setTextColor(QColor("white"))
 
 
 # 标签栏界面
@@ -363,17 +368,68 @@ class Window(MSFluentWindow):
         file_dir = filedialog.askopenfilename(
             title="选择文件",
         )
+
+        if not file_dir:
+            return
+
         filename = os.path.basename(file_dir).split('/')[-1]
 
-        if file_dir:
-            try:
-                f = open(file_dir, "r")
+        try:
+            # 读取文本内容
+            with open(file_dir, "r", encoding='utf-8') as f:
                 filedata = f.read()
-                self.addTab(filename, filename, '')
-                self.current_editor.setPlainText(filedata)
-                f.close()
-            except UnicodeDecodeError:
-                messagebox.showerror("错误的文件类型！", "不支持此文件类型！")
+
+            self.addTab(filename, filename, '')
+            self.current_editor.setPlainText(filedata)
+
+            # 检查是否存在对应的JSON格式文件
+            json_path = os.path.splitext(file_dir)[0] + '.json'
+            if os.path.exists(json_path):
+                with open(json_path, 'r', encoding='utf-8') as json_file:
+                    format_info = json.load(json_file)
+
+                # 应用格式
+                cursor = self.current_editor.textCursor()
+                cursor.setPosition(0)
+
+                for format_data in format_info:
+                    cursor.setPosition(format_data['position'])
+                    cursor.movePosition(cursor.MoveOperation.Right, cursor.MoveMode.KeepAnchor)
+
+                    fmt = QTextCharFormat()
+
+                    # 设置字体
+                    font = QFont(format_data['font_family'])
+                    font.setPointSize(format_data['font_size'])
+                    font.setBold(format_data['bold'])
+                    font.setItalic(format_data['italic'])
+                    font.setUnderline(format_data['underline'])
+                    fmt.setFont(font)
+
+                    # 设置颜色
+                    color = QColor(format_data['color'])
+                    if color.isValid():
+                        fmt.setForeground(color)
+                    else:
+                        fmt.setForeground(QColor("white"))  # 默认使用白色
+
+                    cursor.setCharFormat(fmt)
+                    cursor.clearSelection()
+
+            else:
+                # 如果没有对应的JSON文件，将所有文本设置为默认颜色（白色）
+                cursor = self.current_editor.textCursor()
+                cursor.select(QTextCursor.SelectionType.Document)
+                fmt = QTextCharFormat()
+                fmt.setForeground(QColor("white"))
+                cursor.mergeCharFormat(fmt)
+
+            self.current_editor.setFocus()
+
+        except UnicodeDecodeError:
+            messagebox.showerror("错误的文件类型！", "不支持此文件类型！")
+        except Exception as e:
+            print(f"打开文件时发生错误: {e}")
 
     def save_document(self):
         try:
@@ -382,7 +438,7 @@ class Window(MSFluentWindow):
                 return  # 检查是否有活动的 TWidget
 
             text_to_save = self.current_editor.toPlainText()
-            print("要保存的文本：", text_to_save)  # Debug print
+            print("要保存的文本：", text_to_save)
 
             name = filedialog.asksaveasfilename(
                 title="选择文件",
@@ -393,7 +449,7 @@ class Window(MSFluentWindow):
 
             if name:
                 # 保存文本内容
-                with open(name, 'w') as file:
+                with open(name, 'w', encoding='utf-8') as file:
                     file.write(text_to_save)
 
                 # 获取格式信息
@@ -403,19 +459,20 @@ class Window(MSFluentWindow):
                 for i in range(len(text_to_save)):
                     cursor.setPosition(i)
                     char_format = cursor.charFormat()
+                    color = char_format.foreground().color()
                     format_info.append({
                         'position': i,
-                        'bold': char_format.fontWeight() == QFont.Weight.Bold,
-                        'italic': char_format.fontItalic(),
-                        'underline': char_format.fontUnderline(),
+                        'bold': char_format.font().bold(),
+                        'italic': char_format.font().italic(),
+                        'underline': char_format.font().underline(),
                         'font_family': char_format.font().family(),
                         'font_size': char_format.font().pointSize(),
-                        'color': char_format.foreground().color().name()
+                        'color': color.name() if color.isValid() else "white"  # 默认使用白色
                     })
 
                 # 保存格式信息到JSON文件
                 json_name = os.path.splitext(name)[0] + '.json'
-                with open(json_name, 'w') as json_file:
+                with open(json_name, 'w', encoding='utf-8') as json_file:
                     json.dump(format_info, json_file)
 
                 title = os.path.basename(name) + " ~ ZenNotes"
@@ -477,10 +534,10 @@ class Window(MSFluentWindow):
 
 
 if __name__ == '__main__':
-    font = QFont("DotNess", 12)
+    font = QFont("Microsoft YaHei UI", 12)
     app = QApplication(sys.argv)
     app.setFont(font)
     w = Window()
-    w.setStyleSheet("background-color : black;")
+    w.setStyleSheet(style_sheet)
     w.show()
     sys.exit(app.exec())
