@@ -1,4 +1,5 @@
 import sys
+import json
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from tkinter import messagebox, filedialog
@@ -8,10 +9,11 @@ from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import *
 from qframelesswindow import *
 
-write_icon = QIcon("./resource/write.svg")
-about_icon = QIcon("./resource/write.svg")
+# write_icon = QIcon("./resource/write.svg")
+# about_icon = QIcon("./resource/write.svg")
+# BOLD_ICON = QIcon("./resource/bold-24.svg")
+# ITALIC_ICON = QIcon("./resource/italic-24.svg")
 
-# Stylesheet 保持不变
 style_sheet = f"""
         QMenuBar {{
             background-color: #323232;
@@ -113,6 +115,8 @@ class CustomTitleBar(MSFluentTitleBar):
 
         file_menu = RoundMenu("文件", self)
 
+        file_menu.setIcon(FIF.FOLDER)
+
         copy_action = Action(FIF.COPY, "复制")
         copy_action.triggered.connect(parent.copy_text)
         file_menu.addAction(copy_action)
@@ -147,7 +151,64 @@ class CustomTitleBar(MSFluentTitleBar):
         save_action.triggered.connect(parent.save_document)
         file_menu.addAction(save_action)
 
+        text_menu = RoundMenu("文字", self)
+
+        text_menu.setIcon(FIF.EDIT)
+
+        font_action = Action(FIF.FONT, "字体")
+        font_action.triggered.connect(parent.change_font)
+        text_menu.addAction(font_action)
+
+        size_action = Action(FIF.FONT_SIZE, "文字大小")
+        size_action.triggered.connect(parent.font_size)
+        text_menu.addAction(size_action)
+
+        # 欢迎去玩 palette 社的《纯白交响曲》！
+        color_action = Action(FIF.PALETTE, "颜色")
+        color_action.triggered.connect(parent.change_color)
+        text_menu.addAction(color_action)
+
+        text_menu.addSeparator()
+
+        align_menu = RoundMenu("对齐", self)
+
+        align_menu.setIcon(FIF.ALIGNMENT)
+
+        left_align_action = Action(FIF.CARE_LEFT_SOLID, "左对齐")
+        left_align_action.triggered.connect(parent.align_left)
+        align_menu.addAction(left_align_action)
+
+        center_align_action = Action(FIF.CARE_DOWN_SOLID, "居中对齐")
+        center_align_action.triggered.connect(parent.align_center)
+        align_menu.addAction(center_align_action)
+
+        right_align_action = Action(FIF.CARE_RIGHT_SOLID, "右对齐")
+        right_align_action.triggered.connect(parent.align_right)
+        align_menu.addAction(right_align_action)
+
+        decoration_menu = RoundMenu("文本修饰", self)
+
+        align_menu.setIcon(FIF.FONT_INCREASE)
+
+        # bold_action = Action(BOLD_ICON, "粗体")
+        bold_action = Action("粗体", self)
+        bold_action.triggered.connect(parent.toggle_bold)
+        decoration_menu.addAction(bold_action)
+
+        # italic_action = Action(ITALIC_ICON, "斜体")
+        italic_action = Action("斜体", self)
+        italic_action.triggered.connect(parent.toggle_italic)
+        decoration_menu.addAction(italic_action)
+
+        underline_action = Action("下划线")
+        underline_action.triggered.connect(parent.toggle_underline)
+        decoration_menu.addAction(underline_action)
+
         self.menu.addMenu(file_menu)
+        self.menu.addMenu(text_menu)
+
+        text_menu.addMenu(align_menu)
+        text_menu.addMenu(decoration_menu)
 
         # 创建菜单按钮
         # self.menuButton = TransparentToolButton(FIF.MENU, self)
@@ -240,7 +301,7 @@ class Window(MSFluentWindow):
         self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
 
     def showMessageBox(self):
-        w = MessageBox(
+        aboutWindow = MessageBox(
             'SimpleMDIExample 📝',
             (
                     "Version : 1.0"
@@ -253,10 +314,10 @@ class Window(MSFluentWindow):
             ),
             self
         )
-        w.yesButton.setText('GitHub')
-        w.cancelButton.setText('Return')
+        aboutWindow.yesButton.setText('GitHub')
+        aboutWindow.cancelButton.setText('Return')
 
-        if w.exec():
+        if aboutWindow.exec():
             QDesktopServices.openUrl(QUrl("https://github.com/KNWking/"))
 
     def onTabChanged(self, index: int):
@@ -331,15 +392,78 @@ class Window(MSFluentWindow):
             print("要保存的文件路径：", name)  # Debug print
 
             if name:
+                # 保存文本内容
                 with open(name, 'w') as file:
                     file.write(text_to_save)
-                    title = os.path.basename(name) + " ~ ZenNotes"
-                    active_tab_index = self.tabBar.currentIndex()
-                    self.tabBar.setTabText(active_tab_index, os.path.basename(name))
-                    self.setWindowTitle(title)
-                    print("文件保存成功。")  # Debug print
+
+                # 获取格式信息
+                cursor = self.current_editor.textCursor()
+                format_info = []
+
+                for i in range(len(text_to_save)):
+                    cursor.setPosition(i)
+                    char_format = cursor.charFormat()
+                    format_info.append({
+                        'position': i,
+                        'bold': char_format.fontWeight() == QFont.Weight.Bold,
+                        'italic': char_format.fontItalic(),
+                        'underline': char_format.fontUnderline(),
+                        'font_family': char_format.font().family(),
+                        'font_size': char_format.font().pointSize(),
+                        'color': char_format.foreground().color().name()
+                    })
+
+                # 保存格式信息到JSON文件
+                json_name = os.path.splitext(name)[0] + '.json'
+                with open(json_name, 'w') as json_file:
+                    json.dump(format_info, json_file)
+
+                title = os.path.basename(name) + " ~ ZenNotes"
+                active_tab_index = self.tabBar.currentIndex()
+                self.tabBar.setTabText(active_tab_index, os.path.basename(name))
+                self.setWindowTitle(title)
+                print("文件保存成功。")
         except Exception as e:
             print(f"保存文档时发生错误: {e}")
+
+    def change_font(self):
+        return None
+
+    def change_color(self):
+        return None
+
+    def font_size(self):
+        return None
+
+    def align_left(self):
+        return None
+
+    def align_center(self):
+        return None
+
+    def align_right(self):
+        return None
+
+    def toggle_bold(self):
+        if self.current_editor:
+            fmt = self.current_editor.textCursor().charFormat()
+            if fmt.fontWeight() == QFont.Weight.Bold:
+                fmt.setFontWeight(QFont.Weight.Normal)
+            else:
+                fmt.setFontWeight(QFont.Weight.Bold)
+            self.current_editor.textCursor().mergeCharFormat(fmt)
+
+    def toggle_italic(self):
+        if self.current_editor:
+            fmt = self.current_editor.textCursor().charFormat()
+            fmt.setFontItalic(not fmt.fontItalic())
+            self.current_editor.textCursor().mergeCharFormat(fmt)
+
+    def toggle_underline(self):
+        if self.current_editor:
+            fmt = self.current_editor.textCursor().charFormat()
+            fmt.setFontUnderline(not fmt.fontUnderline())
+            self.current_editor.textCursor().mergeCharFormat(fmt)
 
     def addTab(self, routeKey, text, icon):
         self.tabBar.addTab(routeKey, text, icon)
