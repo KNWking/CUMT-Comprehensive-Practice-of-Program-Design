@@ -253,11 +253,31 @@ class Window(MSFluentWindow):
 
         self.tabBar.addTab(text="Glyph 1", routeKey="Glyph 1")
         self.tabBar.setCurrentTab('Glyph 1')
+        self.initShortcuts()
 
         # self.current_editor = self.text_widgets["Scratch 1"]
 
         self.initNavigation()
         self.initWindow()
+
+    def initShortcuts(self):
+        bold_shortcut = QShortcut(QKeySequence("Ctrl+B"), self)
+        bold_shortcut.activated.connect(self.toggle_bold)
+
+        italic_shortcut = QShortcut(QKeySequence("Ctrl+I"), self)
+        italic_shortcut.activated.connect(self.toggle_italic)
+
+        underline_shortcut = QShortcut(QKeySequence("Ctrl+U"), self)
+        underline_shortcut.activated.connect(self.toggle_underline)
+
+        save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
+        save_shortcut.activated.connect(self.save_document)
+
+        open_shortcut = QShortcut(QKeySequence("Ctrl+O"), self)
+        open_shortcut.activated.connect(self.open_document)
+
+        new_shortcut = QShortcut(QKeySequence("Ctrl+N"), self)
+        new_shortcut.activated.connect(self.onTabAddRequested)
 
     def initNavigation(self):
         self.addSubInterface(self.homeInterface, QIcon("resource/write.svg"), 'Write', QIcon("resource/write.svg"))
@@ -365,121 +385,64 @@ class Window(MSFluentWindow):
         self.current_editor = self.text_widgets[text]
 
     def open_document(self):
-        file_dir = filedialog.askopenfilename(
-            title="选择文件",
+        file_path = filedialog.askopenfilename(
+            title="打开文件",
+            filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")]
         )
 
-        if not file_dir:
+        if not file_path:
             return
 
-        filename = os.path.basename(file_dir).split('/')[-1]
-
         try:
-            # 读取文本内容
-            with open(file_dir, "r", encoding='utf-8') as f:
-                filedata = f.read()
-
-            self.addTab(filename, filename, '')
-            self.current_editor.setPlainText(filedata)
-
-            # 检查是否存在对应的JSON格式文件
-            json_path = os.path.splitext(file_dir)[0] + '.json'
-            if os.path.exists(json_path):
-                with open(json_path, 'r', encoding='utf-8') as json_file:
-                    format_info = json.load(json_file)
-
-                # 应用格式
-                cursor = self.current_editor.textCursor()
-                cursor.setPosition(0)
-
-                for format_data in format_info:
-                    cursor.setPosition(format_data['position'])
-                    cursor.movePosition(cursor.MoveOperation.Right, cursor.MoveMode.KeepAnchor)
-
-                    fmt = QTextCharFormat()
-
-                    # 设置字体
-                    font = QFont(format_data['font_family'])
-                    font.setPointSize(format_data['font_size'])
-                    font.setBold(format_data['bold'])
-                    font.setItalic(format_data['italic'])
-                    font.setUnderline(format_data['underline'])
-                    fmt.setFont(font)
-
-                    # 设置颜色
-                    color = QColor(format_data['color'])
-                    if color.isValid():
-                        fmt.setForeground(color)
-                    else:
-                        fmt.setForeground(QColor("white"))  # 默认使用白色
-
-                    cursor.setCharFormat(fmt)
-                    cursor.clearSelection()
-
+            # 检查是否存在对应的 HTML 文件
+            html_path = os.path.splitext(file_path)[0] + '.html'
+            if os.path.exists(html_path):
+                # 如果存在 HTML 文件，读取 HTML 内容
+                with open(html_path, "r", encoding='utf-8') as f:
+                    filedata = f.read()
+                self.addTab(os.path.basename(file_path), os.path.basename(file_path), '')
+                self.current_editor.setHtml(filedata)
             else:
-                # 如果没有对应的JSON文件，将所有文本设置为默认颜色（白色）
-                cursor = self.current_editor.textCursor()
-                cursor.select(QTextCursor.SelectionType.Document)
-                fmt = QTextCharFormat()
-                fmt.setForeground(QColor("white"))
-                cursor.mergeCharFormat(fmt)
+                # 如果不存在 HTML 文件，读取纯文本内容
+                with open(file_path, "r", encoding='utf-8') as f:
+                    filedata = f.read()
+                self.addTab(os.path.basename(file_path), os.path.basename(file_path), '')
+                self.current_editor.setPlainText(filedata)
 
+            self.current_editor.file_path = file_path
             self.current_editor.setFocus()
 
-        except UnicodeDecodeError:
-            messagebox.showerror("错误的文件类型！", "不支持此文件类型！")
         except Exception as e:
             print(f"打开文件时发生错误: {e}")
 
     def save_document(self):
-        try:
-            if not self.current_editor:
-                print("未找到活动的 TWidget.")
-                return  # 检查是否有活动的 TWidget
+        if not self.current_editor:
+            return
 
-            text_to_save = self.current_editor.toPlainText()
-            print("要保存的文本：", text_to_save)
-
-            name = filedialog.asksaveasfilename(
-                title="选择文件",
+        if not hasattr(self.current_editor, 'file_path') or not self.current_editor.file_path:
+            file_path = filedialog.asksaveasfilename(
+                title="保存文件",
                 filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")]
             )
+            if not file_path:
+                return
+            self.current_editor.file_path = file_path
+        else:
+            file_path = self.current_editor.file_path
 
-            print("要保存的文件路径：", name)  # Debug print
+        try:
+            # 保存纯文本内容
+            with open(file_path, 'w', encoding='utf-8') as file:
+                file.write(self.current_editor.toPlainText())
 
-            if name:
-                # 保存文本内容
-                with open(name, 'w', encoding='utf-8') as file:
-                    file.write(text_to_save)
+            # 检查是否包含富文本格式
+            if self.current_editor.document().allFormats():
+                # 如果包含格式，保存为 HTML
+                html_path = os.path.splitext(file_path)[0] + '.html'
+                with open(html_path, 'w', encoding='utf-8') as html_file:
+                    html_file.write(self.current_editor.toHtml())
 
-                # 获取格式信息
-                cursor = self.current_editor.textCursor()
-                format_info = []
-
-                for i in range(len(text_to_save)):
-                    cursor.setPosition(i)
-                    char_format = cursor.charFormat()
-                    color = char_format.foreground().color()
-                    format_info.append({
-                        'position': i,
-                        'bold': char_format.font().bold(),
-                        'italic': char_format.font().italic(),
-                        'underline': char_format.font().underline(),
-                        'font_family': char_format.font().family(),
-                        'font_size': char_format.font().pointSize(),
-                        'color': color.name() if color.isValid() else "white"  # 默认使用白色
-                    })
-
-                # 保存格式信息到JSON文件
-                json_name = os.path.splitext(name)[0] + '.json'
-                with open(json_name, 'w', encoding='utf-8') as json_file:
-                    json.dump(format_info, json_file)
-
-                title = os.path.basename(name) + " ~ ZenNotes"
-                active_tab_index = self.tabBar.currentIndex()
-                self.tabBar.setTabText(active_tab_index, os.path.basename(name))
-                self.setWindowTitle(title)
-                print("文件保存成功。")
+            print("文件保存成功。")
         except Exception as e:
             print(f"保存文档时发生错误: {e}")
 
@@ -503,24 +466,30 @@ class Window(MSFluentWindow):
 
     def toggle_bold(self):
         if self.current_editor:
-            fmt = self.current_editor.textCursor().charFormat()
-            if fmt.fontWeight() == QFont.Weight.Bold:
-                fmt.setFontWeight(QFont.Weight.Normal)
+            cursor = self.current_editor.textCursor()
+            format = QTextCharFormat()
+            if cursor.charFormat().fontWeight() == QFont.Weight.Bold:
+                format.setFontWeight(QFont.Weight.Normal)
             else:
-                fmt.setFontWeight(QFont.Weight.Bold)
-            self.current_editor.textCursor().mergeCharFormat(fmt)
+                format.setFontWeight(QFont.Weight.Bold)
+            cursor.mergeCharFormat(format)
+            self.current_editor.setTextCursor(cursor)
 
     def toggle_italic(self):
         if self.current_editor:
-            fmt = self.current_editor.textCursor().charFormat()
-            fmt.setFontItalic(not fmt.fontItalic())
-            self.current_editor.textCursor().mergeCharFormat(fmt)
+            cursor = self.current_editor.textCursor()
+            format = QTextCharFormat()
+            format.setFontItalic(not cursor.charFormat().fontItalic())
+            cursor.mergeCharFormat(format)
+            self.current_editor.setTextCursor(cursor)
 
     def toggle_underline(self):
         if self.current_editor:
-            fmt = self.current_editor.textCursor().charFormat()
-            fmt.setFontUnderline(not fmt.fontUnderline())
-            self.current_editor.textCursor().mergeCharFormat(fmt)
+            cursor = self.current_editor.textCursor()
+            format = QTextCharFormat()
+            format.setFontUnderline(not cursor.charFormat().fontUnderline())
+            cursor.mergeCharFormat(format)
+            self.current_editor.setTextCursor(cursor)
 
     def addTab(self, routeKey, text, icon):
         self.tabBar.addTab(routeKey, text, icon)
