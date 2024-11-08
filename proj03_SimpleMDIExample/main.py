@@ -180,7 +180,7 @@ class CustomTitleBar(MSFluentTitleBar):
         # 欢迎去玩 palette 社的《纯白交响曲》！
         color_action = Action(FIF.PALETTE, "颜色")
         color_action.setShortcut("Alt+C")
-        color_action.triggered.connect(parent.change_color)
+        color_action.triggered.connect(parent.change_text_color)
         text_menu.addAction(color_action)
 
         text_menu.addSeparator()
@@ -208,13 +208,11 @@ class CustomTitleBar(MSFluentTitleBar):
 
         align_menu.setIcon(FIF.FONT_INCREASE)
 
-        # bold_action = Action(BOLD_ICON, "粗体")
         bold_action = Action("粗体", self)
         bold_action.setShortcut("Ctrl+B")
         bold_action.triggered.connect(parent.toggle_bold)
         decoration_menu.addAction(bold_action)
 
-        # italic_action = Action(ITALIC_ICON, "斜体")
         italic_action = Action("斜体", self)
         italic_action.setShortcut("Ctrl+I")
         italic_action.triggered.connect(parent.toggle_italic)
@@ -300,6 +298,9 @@ class Window(MSFluentWindow):
         # Alt
         font_shortcut = QShortcut(QKeySequence("Alt+A"), self)
         font_shortcut.activated.connect(self.change_font)
+
+        color_shortcut = QShortcut(QKeySequence("Alt+C"), self)
+        color_shortcut.activated.connect(self.change_text_color)
 
     def initNavigation(self):
         self.addSubInterface(self.homeInterface, QIcon("resource/write.svg"), 'Write', QIcon("resource/write.svg"))
@@ -514,8 +515,21 @@ class Window(MSFluentWindow):
                 # 更新当前编辑器的默认字体，只影响新输入的文本
                 # self.current_editor.document().setDefaultFont(font)
 
-    def change_color(self):
-        return None
+    def change_text_color(self):
+        if self.current_editor:
+            cursor = self.current_editor.textCursor()
+            current_color = self.current_editor.textColor()
+
+            color = QColorDialog.getColor(current_color, self, "选择文字颜色")
+            if color.isValid():
+                if cursor.hasSelection():
+                    # 如果有选中的文本，只改变选中文本的颜色
+                    format = QTextCharFormat()
+                    format.setForeground(color)
+                    cursor.mergeCharFormat(format)
+                else:
+                    # 如果没有选中的文本，改变光标位置的文字颜色
+                    self.current_editor.setTextColor(color)
 
     def font_size(self):
         return None
