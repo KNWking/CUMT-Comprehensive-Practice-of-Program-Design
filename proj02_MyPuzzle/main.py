@@ -70,9 +70,9 @@ class PuzzleGame(QMainWindow):
         self.timeLeft = 0
         self.original_image_dialog = None
         self.challengeTime = 0
-        self.EASY = 30
-        self.MEDIUM = 90
-        self.HARD = 360
+        self.EASY_TIME = 30
+        self.MEDIUM_TIME = 90
+        self.HARD_TIME = 360
 
     def initUI(self):
         self.setWindowTitle('myPuzzle')
@@ -202,7 +202,7 @@ class PuzzleGame(QMainWindow):
             for col in range(gridSize):
                 piece = PuzzlePiece(row, col)
                 piece.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-                piece.setMinimumSize(1, 1)  # 允许缩小到最小1x1像素
+                piece.setMinimumSize(1, 1)
 
                 if (row, col) != self.emptyPosition:
                     # 计算原图中对应的区域
@@ -288,7 +288,7 @@ class PuzzleGame(QMainWindow):
                 break
 
             if attempts > 1000:
-                print("Exceeded maximum attempts, forcing a solvable puzzle.")
+                print("超出最大尝试次数，尝试强制生成可解题目")
                 if n % 2 == 1:
                     while inversions % 2 != 0:
                         random.shuffle(puzzle)
@@ -433,18 +433,18 @@ class PuzzleGame(QMainWindow):
         self.createPuzzle(self.gridSideNumber)
         difficulty = self.difficultyComboBox.currentText()
         if difficulty == "容易":
-            self.timeLeft = self.EASY
-            self.challengeTime = self.EASY
+            self.timeLeft = self.EASY_TIME
+            self.challengeTime = self.EASY_TIME
         elif difficulty == "中等":
-            self.timeLeft = self.MEDIUM
-            self.challengeTime = self.MEDIUM
+            self.timeLeft = self.MEDIUM_TIME
+            self.challengeTime = self.MEDIUM_TIME
         elif difficulty == "困难":
-            self.timeLeft = self.HARD
-            self.challengeTime = self.HARD
+            self.timeLeft = self.HARD_TIME
+            self.challengeTime = self.HARD_TIME
         else:
             # 默认时间
-            self.timeLeft = self.MEDIUM
-            self.challengeTime = self.MEDIUM
+            self.timeLeft = self.MEDIUM_TIME
+            self.challengeTime = self.MEDIUM_TIME
 
         self.timer.start(1000)  # 每秒更新一次
         self.createPuzzle(self.gridSideNumber)
