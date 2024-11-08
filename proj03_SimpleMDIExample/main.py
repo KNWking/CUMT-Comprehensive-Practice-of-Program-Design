@@ -260,6 +260,7 @@ class Window(MSFluentWindow):
         self.initNavigation()
         self.initWindow()
 
+    # 快捷键
     def initShortcuts(self):
         bold_shortcut = QShortcut(QKeySequence("Ctrl+B"), self)
         bold_shortcut.activated.connect(self.toggle_bold)
@@ -434,10 +435,14 @@ class Window(MSFluentWindow):
         if not hasattr(self.current_editor, 'file_path') or not self.current_editor.file_path:
             file_path = filedialog.asksaveasfilename(
                 title="保存文件",
-                filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")]
+                filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")],
+                defaultextension=".txt"  # 设置默认扩展名
             )
             if not file_path:
                 return
+            # 如果用户没有指定 .txt 后缀，自动添加
+            if not file_path.lower().endswith('.txt'):
+                file_path += '.txt'
             self.current_editor.file_path = file_path
         else:
             file_path = self.current_editor.file_path
