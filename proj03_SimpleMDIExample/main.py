@@ -464,7 +464,34 @@ class Window(MSFluentWindow):
             print(f"保存文档时发生错误: {e}")
 
     def change_font(self):
-        return None
+        if self.current_editor:
+            cursor = self.current_editor.textCursor()
+            has_selection = cursor.hasSelection()
+
+            if has_selection:
+                # 如果有选中的文本，获取选中文本的字体
+                format = cursor.charFormat()
+                current_font = format.font()
+            else:
+                # 如果没有选中的文本，获取光标位置的字体
+                current_font = self.current_editor.currentFont()
+
+            font, ok = QFontDialog.getFont(current_font, self, "选择字体")
+            if ok:
+                if has_selection:
+                    # 如果有选中的文本，只改变选中文本的字体
+                    format = QTextCharFormat()
+                    format.setFont(font)
+                    cursor.mergeCharFormat(format)
+                else:
+                    # 如果没有选中的文本，改变整个文档的字体
+                    self.current_editor.selectAll()
+                    self.current_editor.setCurrentFont(font)
+                    cursor.clearSelection()
+                    self.current_editor.setTextCursor(cursor)
+
+                # 更新当前编辑器的默认字体，只影响新输入的文本
+                # self.current_editor.document().setDefaultFont(font)
 
     def change_color(self):
         return None
