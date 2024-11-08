@@ -123,36 +123,44 @@ class CustomTitleBar(MSFluentTitleBar):
         file_menu.setIcon(FIF.FOLDER)
 
         copy_action = Action(FIF.COPY, "复制")
+        copy_action.setShortcut("Ctrl+C")
         copy_action.triggered.connect(parent.copy_text)
         file_menu.addAction(copy_action)
 
         paste_action = Action(FIF.PASTE, "粘贴")
+        paste_action.setShortcut("Ctrl+V")
         paste_action.triggered.connect(parent.paste_text)
         file_menu.addAction(paste_action)
 
         cut_action = Action(FIF.CUT, "剪切")
+        cut_action.setShortcut("Ctrl+X")
         cut_action.triggered.connect(parent.cut_text)
         file_menu.addAction(cut_action)
 
         undo_action = Action(FIF.CANCEL, "撤销")
+        undo_action.setShortcut("Ctrl+Z")
         undo_action.triggered.connect(parent.undo_action)
         file_menu.addAction(undo_action)
 
         redo_action = Action(FIF.HISTORY, "重做")
+        redo_action.setShortcut("Ctrl+Y")
         redo_action.triggered.connect(parent.redo_action)
         file_menu.addAction(redo_action)
 
         file_menu.addSeparator()
 
         new_action = Action(FIF.ADD, "新建")
+        new_action.setShortcut("Ctrl+N")
         new_action.triggered.connect(parent.onTabAddRequested)
         file_menu.addAction(new_action)
 
         open_action = Action(FIF.SEND_FILL, "打开")
+        open_action.setShortcut("Ctrl+O")
         open_action.triggered.connect(parent.open_document)
         file_menu.addAction(open_action)
 
         save_action = Action(FIF.SAVE, "保存")
+        save_action.setShortcut("Ctrl+S")
         save_action.triggered.connect(parent.save_document)
         file_menu.addAction(save_action)
 
@@ -160,7 +168,8 @@ class CustomTitleBar(MSFluentTitleBar):
 
         text_menu.setIcon(FIF.EDIT)
 
-        font_action = Action(FIF.FONT, "字体")
+        font_action = Action(FIF.FONT, "字体和大小")
+        font_action.setShortcut("Alt+A")
         font_action.triggered.connect(parent.change_font)
         text_menu.addAction(font_action)
 
@@ -170,6 +179,7 @@ class CustomTitleBar(MSFluentTitleBar):
 
         # 欢迎去玩 palette 社的《纯白交响曲》！
         color_action = Action(FIF.PALETTE, "颜色")
+        color_action.setShortcut("Alt+C")
         color_action.triggered.connect(parent.change_color)
         text_menu.addAction(color_action)
 
@@ -180,14 +190,17 @@ class CustomTitleBar(MSFluentTitleBar):
         align_menu.setIcon(FIF.ALIGNMENT)
 
         left_align_action = Action(FIF.CARE_LEFT_SOLID, "左对齐")
+        left_align_action.setShortcut("Alt+Left")
         left_align_action.triggered.connect(parent.align_left)
         align_menu.addAction(left_align_action)
 
         center_align_action = Action(FIF.CARE_DOWN_SOLID, "居中对齐")
+        center_align_action.setShortcut("Alt+Down")
         center_align_action.triggered.connect(parent.align_center)
         align_menu.addAction(center_align_action)
 
         right_align_action = Action(FIF.CARE_RIGHT_SOLID, "右对齐")
+        right_align_action.setShortcut("Alt+Right")
         right_align_action.triggered.connect(parent.align_right)
         align_menu.addAction(right_align_action)
 
@@ -197,15 +210,18 @@ class CustomTitleBar(MSFluentTitleBar):
 
         # bold_action = Action(BOLD_ICON, "粗体")
         bold_action = Action("粗体", self)
+        bold_action.setShortcut("Ctrl+B")
         bold_action.triggered.connect(parent.toggle_bold)
         decoration_menu.addAction(bold_action)
 
         # italic_action = Action(ITALIC_ICON, "斜体")
         italic_action = Action("斜体", self)
+        italic_action.setShortcut("Ctrl+I")
         italic_action.triggered.connect(parent.toggle_italic)
         decoration_menu.addAction(italic_action)
 
         underline_action = Action("下划线")
+        underline_action.setShortcut("Ctrl+U")
         underline_action.triggered.connect(parent.toggle_underline)
         decoration_menu.addAction(underline_action)
 
@@ -262,6 +278,7 @@ class Window(MSFluentWindow):
 
     # 快捷键
     def initShortcuts(self):
+        # Ctrl
         bold_shortcut = QShortcut(QKeySequence("Ctrl+B"), self)
         bold_shortcut.activated.connect(self.toggle_bold)
 
@@ -279,6 +296,10 @@ class Window(MSFluentWindow):
 
         new_shortcut = QShortcut(QKeySequence("Ctrl+N"), self)
         new_shortcut.activated.connect(self.onTabAddRequested)
+
+        # Alt
+        font_shortcut = QShortcut(QKeySequence("Alt+A"), self)
+        font_shortcut.activated.connect(self.change_font)
 
     def initNavigation(self):
         self.addSubInterface(self.homeInterface, QIcon("resource/write.svg"), 'Write', QIcon("resource/write.svg"))
