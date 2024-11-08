@@ -147,6 +147,10 @@ class CustomTitleBar(MSFluentTitleBar):
         redo_action.triggered.connect(parent.redo_action)
         file_menu.addAction(redo_action)
 
+        find_action = Action(FIF.SEARCH, "查找")
+        find_action.triggered.connect(parent.find_text)
+        file_menu.addAction(find_action)
+
         file_menu.addSeparator()
 
         new_action = Action(FIF.ADD, "新建")
@@ -173,10 +177,6 @@ class CustomTitleBar(MSFluentTitleBar):
         font_action.triggered.connect(parent.change_font)
         text_menu.addAction(font_action)
 
-        size_action = Action(FIF.FONT_SIZE, "文字大小")
-        size_action.triggered.connect(parent.font_size)
-        text_menu.addAction(size_action)
-
         # 欢迎去玩 palette 社的《纯白交响曲》！
         color_action = Action(FIF.PALETTE, "颜色")
         color_action.setShortcut("Alt+C")
@@ -190,21 +190,21 @@ class CustomTitleBar(MSFluentTitleBar):
         align_menu.setIcon(FIF.ALIGNMENT)
 
         left_align_action = Action(FIF.CARE_LEFT_SOLID, "左对齐")
-        left_align_action.setShortcut("Alt+Left")
+        left_align_action.setShortcut("Alt+←")
         left_align_action.triggered.connect(parent.align_left)
         align_menu.addAction(left_align_action)
 
         center_align_action = Action(FIF.CARE_DOWN_SOLID, "居中对齐")
-        center_align_action.setShortcut("Alt+Down")
+        center_align_action.setShortcut("Alt+↓")
         center_align_action.triggered.connect(parent.align_center)
         align_menu.addAction(center_align_action)
 
         right_align_action = Action(FIF.CARE_RIGHT_SOLID, "右对齐")
-        right_align_action.setShortcut("Alt+Right")
+        right_align_action.setShortcut("Alt+→")
         right_align_action.triggered.connect(parent.align_right)
         align_menu.addAction(right_align_action)
 
-        decoration_menu = RoundMenu("文本修饰", self)
+        decoration_menu = RoundMenu(FIF.FONT_SIZE, "文本修饰")
 
         align_menu.setIcon(FIF.FONT_INCREASE)
 
@@ -301,6 +301,18 @@ class Window(MSFluentWindow):
 
         color_shortcut = QShortcut(QKeySequence("Alt+C"), self)
         color_shortcut.activated.connect(self.change_text_color)
+
+        left_align_shortcut = QShortcut(QKeySequence("Alt+Left"), self)
+        left_align_shortcut.activated.connect(self.align_left)
+
+        center_align_shortcut = QShortcut(QKeySequence("Alt+Down"), self)
+        center_align_shortcut.activated.connect(self.align_center)
+
+        center_align_shortcut = QShortcut(QKeySequence("Alt+Up"), self)
+        center_align_shortcut.activated.connect(self.align_center)
+
+        right_align_shortcut = QShortcut(QKeySequence("Alt+Right"), self)
+        right_align_shortcut.activated.connect(self.align_right)
 
     def initNavigation(self):
         self.addSubInterface(self.homeInterface, QIcon("resource/write.svg"), 'Write', QIcon("resource/write.svg"))
@@ -535,13 +547,16 @@ class Window(MSFluentWindow):
         return None
 
     def align_left(self):
-        return None
+        if self.current_editor:
+            self.current_editor.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
     def align_center(self):
-        return None
+        if self.current_editor:
+            self.current_editor.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def align_right(self):
-        return None
+        if self.current_editor:
+            self.current_editor.setAlignment(Qt.AlignmentFlag.AlignRight)
 
     def toggle_bold(self):
         if self.current_editor:
