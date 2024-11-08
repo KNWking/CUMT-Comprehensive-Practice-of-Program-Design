@@ -251,8 +251,8 @@ class Window(MSFluentWindow):
         # self.videoInterface = Widget('Video Interface', self)
         # self.libraryInterface = Widget('library Interface', self)
 
-        self.tabBar.addTab(text="Glyph 1", routeKey="Glyph 1")
-        self.tabBar.setCurrentTab('Glyph 1')
+        self.tabBar.addTab(text="新建标签 1", routeKey="新建标签 1")
+        self.tabBar.setCurrentTab('新建标签 1')
         self.initShortcuts()
 
         # self.current_editor = self.text_widgets["Scratch 1"]
@@ -378,7 +378,7 @@ class Window(MSFluentWindow):
             self.current_editor.redo()
 
     def onTabAddRequested(self):
-        text = f'Glyph {self.tabBar.count() + 1}'
+        text = f'新建标签 {self.tabBar.count() + 1}'
         self.addTab(text, text, '')
 
         # 将 current_editor 设置为新添加的 TWidget
