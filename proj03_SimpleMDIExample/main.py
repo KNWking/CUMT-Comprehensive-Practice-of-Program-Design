@@ -148,6 +148,7 @@ class CustomTitleBar(MSFluentTitleBar):
         file_menu.addAction(redo_action)
 
         find_action = Action(FIF.SEARCH, "查找")
+        find_action.setShortcut("Ctrl+F")
         find_action.triggered.connect(parent.find_text)
         file_menu.addAction(find_action)
 
@@ -204,9 +205,10 @@ class CustomTitleBar(MSFluentTitleBar):
         right_align_action.triggered.connect(parent.align_right)
         align_menu.addAction(right_align_action)
 
-        decoration_menu = RoundMenu(FIF.FONT_SIZE, "文本修饰")
+        decoration_menu = RoundMenu("文本修饰", self)
 
         align_menu.setIcon(FIF.FONT_INCREASE)
+        decoration_menu.setIcon(FIF.FONT_SIZE)
 
         bold_action = Action("粗体", self)
         bold_action.setShortcut("Ctrl+B")
@@ -280,20 +282,23 @@ class Window(MSFluentWindow):
         bold_shortcut = QShortcut(QKeySequence("Ctrl+B"), self)
         bold_shortcut.activated.connect(self.toggle_bold)
 
+        find_shortcut = QShortcut(QKeySequence("Ctrl+F"), self)
+        find_shortcut.activated.connect(self.find_text)
+
         italic_shortcut = QShortcut(QKeySequence("Ctrl+I"), self)
         italic_shortcut.activated.connect(self.toggle_italic)
 
-        underline_shortcut = QShortcut(QKeySequence("Ctrl+U"), self)
-        underline_shortcut.activated.connect(self.toggle_underline)
-
-        save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
-        save_shortcut.activated.connect(self.save_document)
+        new_shortcut = QShortcut(QKeySequence("Ctrl+N"), self)
+        new_shortcut.activated.connect(self.onTabAddRequested)
 
         open_shortcut = QShortcut(QKeySequence("Ctrl+O"), self)
         open_shortcut.activated.connect(self.open_document)
 
-        new_shortcut = QShortcut(QKeySequence("Ctrl+N"), self)
-        new_shortcut.activated.connect(self.onTabAddRequested)
+        save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
+        save_shortcut.activated.connect(self.save_document)
+
+        underline_shortcut = QShortcut(QKeySequence("Ctrl+U"), self)
+        underline_shortcut.activated.connect(self.toggle_underline)
 
         # Alt
         font_shortcut = QShortcut(QKeySequence("Alt+A"), self)
@@ -532,8 +537,9 @@ class Window(MSFluentWindow):
             cursor = self.current_editor.textCursor()
             current_color = self.current_editor.textColor()
 
-            color = QColorDialog.getColor(current_color, self, "选择文字颜色")
-            if color.isValid():
+            color_dialog = ColorDialog(current_color, "选择文字颜色", self, enableAlpha=False)
+
+            def apply_color(color):
                 if cursor.hasSelection():
                     # 如果有选中的文本，只改变选中文本的颜色
                     format = QTextCharFormat()
@@ -542,6 +548,13 @@ class Window(MSFluentWindow):
                 else:
                     # 如果没有选中的文本，改变光标位置的文字颜色
                     self.current_editor.setTextColor(color)
+
+            color_dialog.colorChanged.connect(apply_color)
+
+            if color_dialog.exec():
+                # 用户点击了确定按钮
+                final_color = color_dialog.color
+                apply_color(final_color)
 
     def font_size(self):
         return None
@@ -584,6 +597,16 @@ class Window(MSFluentWindow):
             format.setFontUnderline(not cursor.charFormat().fontUnderline())
             cursor.mergeCharFormat(format)
             self.current_editor.setTextCursor(cursor)
+
+    def find_text(self):
+        if self.current_editor:
+            text, ok = QInputDialog.getText(self, '查找', '输入要查找的文本:')
+            if ok and text:
+                cursor = self.current_editor.document().find(text)
+                if not cursor.isNull():
+                    self.current_editor.setTextCursor(cursor)
+                else:
+                    QMessageBox.information(self, "查找结果", "未找到匹配文本")
 
     def addTab(self, routeKey, text, icon):
         self.tabBar.addTab(routeKey, text, icon)
