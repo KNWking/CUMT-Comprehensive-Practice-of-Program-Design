@@ -73,6 +73,9 @@ class PuzzleGame(QMainWindow):
         self.EASY_TIME = 30
         self.MEDIUM_TIME = 90
         self.HARD_TIME = 360
+        self.EASY_GRID_SIDE_NUMBER = 2
+        self.MEDIUM_GRID_SIDE_NUMBER = 3
+        self.HARD_GRID_SIDE_NUMBER = 4
 
     def initUI(self):
         self.setWindowTitle('myPuzzle')
@@ -415,11 +418,11 @@ class PuzzleGame(QMainWindow):
     def setDifficulty(self):
         difficulty = self.difficultyComboBox.currentText()
         if difficulty == "容易":
-            self.gridSideNumber = 2
+            self.gridSideNumber = self.EASY_GRID_SIDE_NUMBER
         elif difficulty == "中等":
-            self.gridSideNumber = 3
+            self.gridSideNumber = self.MEDIUM_GRID_SIDE_NUMBER
         elif difficulty == "困难":
-            self.gridSideNumber = 4
+            self.gridSideNumber = self.HARD_GRID_SIDE_NUMBER
         else:
             # 如果难度不是预设的三个选项，就假设它是一个数字
             try:
