@@ -272,17 +272,18 @@ class PuzzleGame(QMainWindow):
             blank_row = blank_index // n
             blank_col = blank_index % n
 
-            print(f"Attempt {attempts}:")
-            print(f"Puzzle: {puzzle}")
-            print(f"Inversions: {inversions}")
-            print(f"Blank position: row {blank_row}, col {blank_col}")
+            # debug 用
+            print(f"尝试 {attempts}:")
+            print(f"拼图: {puzzle}")
+            print(f"逆序数: {inversions}")
+            print(f"空白方格位置: 行 {blank_row}, 列 {blank_col}")
 
             if n % 2 == 1:
                 is_solvable = inversions % 2 == 0
             else:
-                is_solvable = (inversions + blank_row) % 2 == 0  # 注意这里改成了 == 0
+                is_solvable = (inversions + blank_row) % 2 == 0
 
-            print(f"Is solvable: {is_solvable}")
+            print(f"是否可解: {is_solvable}")
 
             if is_solvable:
                 break
@@ -301,9 +302,9 @@ class PuzzleGame(QMainWindow):
                         blank_row = blank_index // n
                 break
 
-        print(f"Final puzzle: {puzzle}")
-        print(f"Final inversions: {inversions}")
-        print(f"Final blank position: row {blank_row}, col {blank_col}")
+        print(f"最终拼图: {puzzle}")
+        print(f"最终逆序数: {inversions}")
+        print(f"最终空白块位置: row {blank_row}, col {blank_col}")
         self.updatePuzzleFromList(puzzle)
 
     def countInversions(self, puzzle):
