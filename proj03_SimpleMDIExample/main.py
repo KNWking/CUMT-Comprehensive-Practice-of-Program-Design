@@ -606,8 +606,15 @@ class Window(MSFluentWindow):
                 if not cursor.isNull():
                     self.current_editor.setTextCursor(cursor)
                 else:
-                    QMessageBox.information(self, "查找结果", "未找到匹配文本")
-
+                    dialog = Dialog(
+                        "查找结果",
+                        "未找到匹配文本",
+                        self
+                    )
+                    dialog.yesButton.setText("确定")
+                    dialog.cancelButton.hide()
+                    dialog.buttonLayout.insertStretch(1)
+                    dialog.exec()
     def addTab(self, routeKey, text, icon):
         self.tabBar.addTab(routeKey, text, icon)
         self.homeInterface.addWidget(TabInterface(text, icon, routeKey, self))
