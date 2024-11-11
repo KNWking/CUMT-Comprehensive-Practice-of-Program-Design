@@ -1,5 +1,5 @@
+import warnings
 import sys
-import json
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from tkinter import messagebox, filedialog
@@ -9,6 +9,8 @@ from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import *
 from qframelesswindow import *
 
+# 忽略底层 PyQt6 库的警告
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 # write_icon = QIcon("./resource/write.svg")
 # about_icon = QIcon("./resource/write.svg")
 # BOLD_ICON = QIcon("./resource/bold-24.svg")
@@ -74,8 +76,14 @@ class CustomTitleBar(MSFluentTitleBar):
         self.toolButtonLayout = QHBoxLayout()
         color = QColor(206, 206, 206) if isDarkTheme() else QColor(96, 96, 96)
         self.menuButton = TransparentToolButton(FIF.MENU, self)
-        self.forwardButton = TransparentToolButton(FIF.RIGHT_ARROW.icon(color=color), self)
-        self.backButton = TransparentToolButton(FIF.LEFT_ARROW.icon(color=color), self)
+
+        # <- 按钮
+        self.backButton = TransparentToolButton(FIF.UP, self)
+        self.backButton.clicked.connect(parent.find_previous)
+
+        # -> 按钮
+        self.forwardButton = TransparentToolButton(FIF.DOWN, self)
+        self.forwardButton.clicked.connect(parent.find_next)
 
         # self.openButton = TransparentToolButton(QIcon("resource/open.png"), self)
         # self.openButton.clicked.connect(parent.open_document)
@@ -84,7 +92,6 @@ class CustomTitleBar(MSFluentTitleBar):
         # self.saveButton = TransparentToolButton(QIcon("resource/save.png"), self)
         # self.saveButton.clicked.connect(parent.save_document)
 
-        self.forwardButton.setDisabled(True)
         self.toolButtonLayout.setContentsMargins(20, 0, 20, 0)
         self.toolButtonLayout.setSpacing(15)
         self.toolButtonLayout.addWidget(self.menuButton)
@@ -258,6 +265,7 @@ class Window(MSFluentWindow):
         self.setTitleBar(CustomTitleBar(self))
         self.tabBar = self.titleBar.tabBar  # type: TabBar
 
+        # 暗黑模式
         setTheme(Theme.DARK)
         setThemeColor(QColor("red"))  # 设置红色强调色
 
@@ -273,6 +281,9 @@ class Window(MSFluentWindow):
 
         # self.current_editor = self.text_widgets["Scratch 1"]
 
+        self.last_search = ""
+        self.search_flags = QTextDocument.FindFlag(0)
+
         self.initNavigation()
         self.initWindow()
 
@@ -284,6 +295,12 @@ class Window(MSFluentWindow):
 
         find_shortcut = QShortcut(QKeySequence("Ctrl+F"), self)
         find_shortcut.activated.connect(self.find_text)
+
+        find_next_shortcut = QShortcut(QKeySequence("Ctrl+Down"), self)
+        find_next_shortcut.activated.connect(self.find_next)
+
+        find_previous_shortcut = QShortcut(QKeySequence("Ctrl+Up"), self)
+        find_previous_shortcut.activated.connect(self.find_previous)
 
         italic_shortcut = QShortcut(QKeySequence("Ctrl+I"), self)
         italic_shortcut.activated.connect(self.toggle_italic)
@@ -600,21 +617,50 @@ class Window(MSFluentWindow):
 
     def find_text(self):
         if self.current_editor:
-            text, ok = QInputDialog.getText(self, '查找', '输入要查找的文本:')
+            text, ok = QInputDialog.getText(self, '查找', '输入要查找的文本:', text=self.last_search)
             if ok and text:
-                cursor = self.current_editor.document().find(text)
-                if not cursor.isNull():
-                    self.current_editor.setTextCursor(cursor)
-                else:
-                    dialog = Dialog(
-                        "查找结果",
-                        "未找到匹配文本",
-                        self
-                    )
-                    dialog.yesButton.setText("确定")
-                    dialog.cancelButton.hide()
-                    dialog.buttonLayout.insertStretch(1)
-                    dialog.exec()
+                self.last_search = text
+                self.find_next()
+                # 启用前进后退按钮
+                self.titleBar.forwardButton.setEnabled(True)
+                self.titleBar.backButton.setEnabled(True)
+
+    def find_next(self):
+        if self.current_editor and self.last_search:
+            found = self.current_editor.find(self.last_search, self.search_flags)
+            if not found:
+                # 如果没找到，从头开始搜索
+                cursor = self.current_editor.textCursor()
+                cursor.movePosition(QTextCursor.MoveOperation.Start)
+                self.current_editor.setTextCursor(cursor)
+                found = self.current_editor.find(self.last_search, self.search_flags)
+                if not found:
+                    self.show_not_found_dialog()
+
+    def find_previous(self):
+        if self.current_editor and self.last_search:
+            flags = self.search_flags | QTextDocument.FindFlag.FindBackward
+            found = self.current_editor.find(self.last_search, flags)
+            if not found:
+                # 如果没找到，从尾部开始搜索
+                cursor = self.current_editor.textCursor()
+                cursor.movePosition(QTextCursor.MoveOperation.End)
+                self.current_editor.setTextCursor(cursor)
+                found = self.current_editor.find(self.last_search, flags)
+                if not found:
+                    self.show_not_found_dialog()
+
+    def show_not_found_dialog(self):
+        dialog = Dialog(
+            "查找结果",
+            f"未找到匹配文本: '{self.last_search}'",
+            self
+        )
+        dialog.yesButton.setText("确定")
+        dialog.cancelButton.hide()
+        dialog.buttonLayout.insertStretch(1)
+        dialog.exec()
+
     def addTab(self, routeKey, text, icon):
         self.tabBar.addTab(routeKey, text, icon)
         self.homeInterface.addWidget(TabInterface(text, icon, routeKey, self))
