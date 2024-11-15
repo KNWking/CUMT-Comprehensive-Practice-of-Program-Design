@@ -16,39 +16,64 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # BOLD_ICON = QIcon("./resource/bold-24.svg")
 # ITALIC_ICON = QIcon("./resource/italic-24.svg")
 
-style_sheet = f"""
-        QMenuBar {{
-            background-color: #323232;
-        }}
-        QMenuBar::item {{
-            background-color: #323232;
-            color: red;
-        }}
-        QMenuBar::item::selected {{
-            background-color: #1b1b1b;
-        }}
-        QMenu {{
-            background-color: rgb(49, 49, 49);
-            color: red;
-            border: 0px solid #000;
-        }}
-        QMenu::item::selected {{
-            background-color: rgb(30, 30, 30);
-        }}
-        QTextEdit {{
-        background-color: #000000;
-        color: white;
-        border: 0;
-    }}
-    """
+style_sheet = """
+    QMenuBar {
+        background-color: #323232;
+    }
+    QMenuBar::item {
+        background-color: #323232;
+        color: red;
+    }
+    QMenuBar::item::selected {
+        background-color: #1b1b1b;
+    }
+    QMenu {
+        background-color: rgb(49, 49, 49);
+        color: red;
+        border: 0px solid #000;
+    }
+    QMenu::item::selected {
+        background-color: rgb(30, 30, 30);
+    }
+"""
+
 
 
 class TWidget(QTextEdit):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setFont(QFont("Microsoft YaHei UI", 16))
-        self.setStyleSheet("QTextEdit{background-color : #000000; color : white; border: 0;}")
-        self.setTextColor(QColor("white"))
+        self.update_theme()
+
+    def update_theme(self):
+        if isDarkTheme():
+            self.setStyleSheet("QTextEdit{background-color: #000000; color: white; border: 0;}")
+            default_color = QColor("white")
+        else:
+            self.setStyleSheet("QTextEdit{background-color: white; color: black; border: 0;}")
+            default_color = QColor("black")
+
+        # 保存当前光标位置和选择状态
+        cursor = self.textCursor()
+        position = cursor.position()
+        anchor = cursor.anchor()
+
+        # 更新所有现有文本的颜色
+        cursor.select(QTextCursor.SelectionType.Document)
+        fmt = cursor.charFormat()
+        fmt.setForeground(default_color)
+        cursor.mergeCharFormat(fmt)
+
+        # 恢复光标位置和选择状态
+        cursor.setPosition(anchor)
+        if position != anchor:
+            cursor.setPosition(position, QTextCursor.MoveMode.KeepAnchor)
+        self.setTextCursor(cursor)
+
+        # 设置默认文本格式
+        fmt = self.currentCharFormat()
+        fmt.setForeground(default_color)
+        self.setCurrentCharFormat(fmt)
 
 
 # 标签栏界面
@@ -240,10 +265,12 @@ class CustomTitleBar(MSFluentTitleBar):
         theme_menu.setIcon(FIF.CONSTRACT)
 
         dark_mode_action = Action(FIF.QUIET_HOURS, "暗黑模式")
+        dark_mode_action.setShortcut("Alt+T")
         dark_mode_action.triggered.connect(lambda: self.change_theme(Theme.DARK))
         theme_menu.addAction(dark_mode_action)
 
         light_mode_action = Action(FIF.BRIGHTNESS, "明亮模式")
+        light_mode_action.setShortcut("Alt+T")
         light_mode_action.triggered.connect(lambda: self.change_theme(Theme.LIGHT))
         theme_menu.addAction(light_mode_action)
 
@@ -287,8 +314,9 @@ class Window(MSFluentWindow):
         self.setTitleBar(CustomTitleBar(self))
         self.tabBar = self.titleBar.tabBar  # type: TabBar
 
-        # 暗黑模式
-        setTheme(Theme.DARK)
+        # 默认暗黑模式
+        self.current_theme = Theme.DARK
+        setTheme(self.current_theme)
         setThemeColor(QColor("red"))  # 设置红色强调色
 
         # 创建子界面
@@ -465,6 +493,7 @@ class Window(MSFluentWindow):
 
         # 将 current_editor 设置为新添加的 TWidget
         self.current_editor = self.text_widgets[text]
+        self.current_editor.update_theme()  # 确保新创建的编辑器使用正确的主题
 
         # 切换到新创建的标签页
         new_index = self.tabBar.count() - 1  # 新标签页的索引
@@ -643,21 +672,29 @@ class Window(MSFluentWindow):
     def update_theme(self):
         # 更新所有编辑器的样式
         for editor in self.text_widgets.values():
-            if isDarkTheme():
-                editor.setStyleSheet("QTextEdit{background-color: #000000; color: white; border: 0;}")
-            else:
-                editor.setStyleSheet("QTextEdit{background-color: white; color: black; border: 0;}")
+            editor.update_theme()
+
+        # 更新其他UI元素
+        self.update()
+
+        # 强制重绘所有编辑器
+        for editor in self.text_widgets.values():
+            editor.viewport().update()
 
         # 更新其他UI元素
         self.update()
 
     def toggle_theme(self):
-        if self.current_theme == Theme.DARK:
-            self.current_theme = Theme.LIGHT
-        else:
-            self.current_theme = Theme.DARK
+        if not hasattr(self, 'current_theme'):
+            self.current_theme = Theme.DARK if isDarkTheme() else Theme.LIGHT
+
+        self.current_theme = Theme.LIGHT if self.current_theme == Theme.DARK else Theme.DARK
         setTheme(self.current_theme)
         self.update_theme()
+
+        # 强制所有编辑器重新应用主题
+        for editor in self.text_widgets.values():
+            editor.update_theme()
 
     def update_theme(self):
         # 更新所有编辑器的样式
