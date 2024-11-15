@@ -176,6 +176,8 @@ class CustomTitleBar(MSFluentTitleBar):
         save_action.triggered.connect(parent.save_document)
         file_menu.addAction(save_action)
 
+
+
         text_menu = RoundMenu("文字", self)
 
         text_menu.setIcon(FIF.EDIT)
@@ -232,8 +234,23 @@ class CustomTitleBar(MSFluentTitleBar):
         underline_action.triggered.connect(parent.toggle_underline)
         decoration_menu.addAction(underline_action)
 
+
+
+        theme_menu = RoundMenu("主题", self)
+        theme_menu.setIcon(FIF.CONSTRACT)
+
+        dark_mode_action = Action(FIF.QUIET_HOURS, "暗黑模式")
+        dark_mode_action.triggered.connect(lambda: self.change_theme(Theme.DARK))
+        theme_menu.addAction(dark_mode_action)
+
+        light_mode_action = Action(FIF.BRIGHTNESS, "明亮模式")
+        light_mode_action.triggered.connect(lambda: self.change_theme(Theme.LIGHT))
+        theme_menu.addAction(light_mode_action)
+
+
         self.menu.addMenu(file_menu)
         self.menu.addMenu(text_menu)
+        self.menu.addMenu(theme_menu)
 
         text_menu.addMenu(align_menu)
         text_menu.addMenu(decoration_menu)
@@ -255,6 +272,11 @@ class CustomTitleBar(MSFluentTitleBar):
 
     def test(self):
         print("hello")
+
+    def change_theme(self, theme):
+        self.parent().current_theme = theme
+        setTheme(theme)
+        self.parent().update_theme()
 
 
 class Window(MSFluentWindow):
@@ -323,6 +345,9 @@ class Window(MSFluentWindow):
 
         color_shortcut = QShortcut(QKeySequence("Alt+C"), self)
         color_shortcut.activated.connect(self.change_text_color)
+
+        theme_toggle_shortcut = QShortcut(QKeySequence("Alt+T"), self)
+        theme_toggle_shortcut.activated.connect(self.toggle_theme)
 
         left_align_shortcut = QShortcut(QKeySequence("Alt+Left"), self)
         left_align_shortcut.activated.connect(self.align_left)
@@ -614,6 +639,36 @@ class Window(MSFluentWindow):
             format.setFontUnderline(not cursor.charFormat().fontUnderline())
             cursor.mergeCharFormat(format)
             self.current_editor.setTextCursor(cursor)
+
+    def update_theme(self):
+        # 更新所有编辑器的样式
+        for editor in self.text_widgets.values():
+            if isDarkTheme():
+                editor.setStyleSheet("QTextEdit{background-color: #000000; color: white; border: 0;}")
+            else:
+                editor.setStyleSheet("QTextEdit{background-color: white; color: black; border: 0;}")
+
+        # 更新其他UI元素
+        self.update()
+
+    def toggle_theme(self):
+        if self.current_theme == Theme.DARK:
+            self.current_theme = Theme.LIGHT
+        else:
+            self.current_theme = Theme.DARK
+        setTheme(self.current_theme)
+        self.update_theme()
+
+    def update_theme(self):
+        # 更新所有编辑器的样式
+        for editor in self.text_widgets.values():
+            if isDarkTheme():
+                editor.setStyleSheet("QTextEdit{background-color: #000000; color: white; border: 0;}")
+            else:
+                editor.setStyleSheet("QTextEdit{background-color: white; color: black; border: 0;}")
+
+        # 更新其他UI元素
+        self.update()
 
     def find_text(self):
         if self.current_editor:
