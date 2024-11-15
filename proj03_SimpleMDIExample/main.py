@@ -184,6 +184,11 @@ class CustomTitleBar(MSFluentTitleBar):
         find_action.triggered.connect(parent.find_text)
         file_menu.addAction(find_action)
 
+        replace_action = Action(FIF.ZOOM, "替换")
+        replace_action.setShortcut("Ctrl+Shift+R")
+        replace_action.triggered.connect(parent.replace_text)
+        file_menu.addAction(replace_action)
+
         file_menu.addSeparator()
 
         new_action = Action(FIF.ADD, "新建")
@@ -388,6 +393,9 @@ class Window(MSFluentWindow):
 
         right_align_shortcut = QShortcut(QKeySequence("Alt+Right"), self)
         right_align_shortcut.activated.connect(self.align_right)
+
+        replace_shortcut = QShortcut(QKeySequence("Ctrl+Shift+R"), self)
+        replace_shortcut.activated.connect(self.replace_text)
 
     def initNavigation(self):
         self.addSubInterface(self.homeInterface, QIcon("resource/write.svg"), 'Write', QIcon("resource/write.svg"))
@@ -752,6 +760,100 @@ class Window(MSFluentWindow):
         dialog.cancelButton.hide()
         dialog.buttonLayout.insertStretch(1)
         dialog.exec()
+
+    def replace_text(self):
+        if self.current_editor:
+            dialog = QDialog(self)
+            dialog.setWindowTitle("替换")
+            layout = QVBoxLayout()
+
+            # 查找输入框
+            find_layout = QHBoxLayout()
+            find_layout.addWidget(QLabel("查找:"))
+            find_input = QLineEdit()
+            find_layout.addWidget(find_input)
+            layout.addLayout(find_layout)
+
+            # 替换输入框
+            replace_layout = QHBoxLayout()
+            replace_layout.addWidget(QLabel("替换为:"))
+            replace_input = QLineEdit()
+            replace_layout.addWidget(replace_input)
+            layout.addLayout(replace_layout)
+
+            # 按钮
+            button_layout = QHBoxLayout()
+            find_button = QPushButton("查找下一个")
+            replace_button = QPushButton("替换")
+            replace_all_button = QPushButton("全部替换")
+            button_layout.addWidget(find_button)
+            button_layout.addWidget(replace_button)
+            button_layout.addWidget(replace_all_button)
+            layout.addLayout(button_layout)
+
+            dialog.setLayout(layout)
+
+            def find_next():
+                text = find_input.text()
+                if text:
+                    cursor = self.current_editor.document().find(text, self.current_editor.textCursor())
+                    if not cursor.isNull():
+                        self.current_editor.setTextCursor(cursor)
+                    else:
+                        InfoBar.success(
+                            title='查找结果',
+                            content="已到达文档末尾，从头开始查找",
+                            orient=Qt.Orientation.Horizontal,
+                            isClosable=True,
+                            position=InfoBarPosition.TOP,
+                            duration=2000,
+                            parent=self
+                        )
+                        cursor = self.current_editor.document().find(text, QTextCursor(self.current_editor.document()))
+                        if not cursor.isNull():
+                            self.current_editor.setTextCursor(cursor)
+                        else:
+                            InfoBar.warning(
+                                title='查找结果',
+                                content=f"未找到匹配文本: '{text}'",
+                                orient=Qt.Orientation.Horizontal,
+                                isClosable=True,
+                                position=InfoBarPosition.TOP,
+                                duration=2000,
+                                parent=self
+                            )
+
+            def replace():
+                if self.current_editor.textCursor().hasSelection():
+                    self.current_editor.textCursor().insertText(replace_input.text())
+                find_next()
+
+            def replace_all():
+                text = find_input.text()
+                replace_text = replace_input.text()
+                cursor = QTextCursor(self.current_editor.document())
+                count = 0
+                while True:
+                    cursor = self.current_editor.document().find(text, cursor)
+                    if cursor.isNull():
+                        break
+                    cursor.insertText(replace_text)
+                    count += 1
+                InfoBar.success(
+                    title='替换结果',
+                    content=f"已替换 {count} 处文本",
+                    orient=Qt.Orientation.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP,
+                    duration=2000,
+                    parent=self
+                )
+
+            find_button.clicked.connect(find_next)
+            replace_button.clicked.connect(replace)
+            replace_all_button.clicked.connect(replace_all)
+
+            dialog.exec()
 
     def addTab(self, routeKey, text, icon):
         self.tabBar.addTab(routeKey, text, icon)
