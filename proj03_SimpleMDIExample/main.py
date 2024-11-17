@@ -110,20 +110,12 @@ class CustomTitleBar(MSFluentTitleBar):
         self.forwardButton = TransparentToolButton(FIF.DOWN, self)
         self.forwardButton.clicked.connect(parent.find_next)
 
-        # self.openButton = TransparentToolButton(QIcon("resource/open.png"), self)
-        # self.openButton.clicked.connect(parent.open_document)
-        # self.newButton = TransparentToolButton(QIcon("resource/new.png"), self)
-        # self.newButton.clicked.connect(parent.onTabAddRequested)
-        # self.saveButton = TransparentToolButton(QIcon("resource/save.png"), self)
-        # self.saveButton.clicked.connect(parent.save_document)
-
         self.toolButtonLayout.setContentsMargins(20, 0, 20, 0)
         self.toolButtonLayout.setSpacing(15)
         self.toolButtonLayout.addWidget(self.menuButton)
         self.toolButtonLayout.addWidget(self.backButton)
         self.toolButtonLayout.addWidget(self.forwardButton)
 
-        # self.toolButtonLayout.addWidget(self.openButton)
         self.hBoxLayout.insertLayout(4, self.toolButtonLayout)
 
         # 添加标签栏
@@ -137,15 +129,10 @@ class CustomTitleBar(MSFluentTitleBar):
         self.tabBar.setCloseButtonDisplayMode(TabCloseButtonDisplayMode.ON_HOVER)
 
         self.tabBar.tabCloseRequested.connect(self.tabBar.removeTab)
-        # self.tabBar.currentChanged.connect(lambda i: print(self.tabBar.tabText(i)))
 
         self.hBoxLayout.insertWidget(5, self.tabBar, 1)
         self.hBoxLayout.setStretch(6, 0)
 
-        # self.hBoxLayout.insertWidget(7, self.saveButton, 0, Qt.AlignmentFlag.AlignLeft)
-        # self.hBoxLayout.insertWidget(7, self.openButton, 0, Qt.AlignmentFlag.AlignLeft)
-        # self.hBoxLayout.insertWidget(7, self.newButton, 0, Qt.AlignmentFlag.AlignLeft)
-        # self.hBoxLayout.insertSpacing(8, 20)
 
         self.menu = RoundMenu("目录")
         self.menu.setStyleSheet("QMenu{color : red;}")
@@ -288,7 +275,6 @@ class CustomTitleBar(MSFluentTitleBar):
         text_menu.addMenu(decoration_menu)
 
         # 创建菜单按钮
-        # self.menuButton = TransparentToolButton(FIF.MENU, self)
         self.menuButton.clicked.connect(self.showMenu)
 
     def showMenu(self):
@@ -326,15 +312,11 @@ class Window(MSFluentWindow):
 
         # 创建子界面
         self.homeInterface = QStackedWidget(self, objectName='homeInterface')
-        # self.settingsInterface = Widget('Application Interface', self)
-        # self.videoInterface = Widget('Video Interface', self)
-        # self.libraryInterface = Widget('library Interface', self)
 
         self.tabBar.addTab(text="新建标签 1", routeKey="新建标签 1")
         self.tabBar.setCurrentTab('新建标签 1')
         self.initShortcuts()
 
-        # self.current_editor = self.text_widgets["Scratch 1"]
 
         self.last_search = ""
         self.search_flags = QTextDocument.FindFlag(0)
@@ -399,11 +381,7 @@ class Window(MSFluentWindow):
 
     def initNavigation(self):
         self.addSubInterface(self.homeInterface, QIcon("resource/write.svg"), 'Write', QIcon("resource/write.svg"))
-        # self.addSubInterface(self.appInterface, FIF.ALBUM, '应用')
-        # self.addSubInterface(self.videoInterface, FIF.EMBED, '视频')
 
-        # self.addSubInterface(self.libraryInterface, FIF.BOOK_SHELF,
-        #                      '库', FIF.LIBRARY_FILL, NavigationItemPosition.BOTTOM)
         self.navigationInterface.addItem(
             routeKey='Help',
             icon=FIF.INFO,
@@ -439,7 +417,6 @@ class Window(MSFluentWindow):
         self.setWindowIcon(QIcon('resource/icon.ico'))
         self.setWindowTitle('SimpleMDIExample')
 
-        #        desktop = QApplication.desktop().availableGeometry()
         w, h = 1200, 800
         self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
 
@@ -609,7 +586,6 @@ class Window(MSFluentWindow):
                     self.current_editor.setTextCursor(cursor)
 
                 # 更新当前编辑器的默认字体，只影响新输入的文本
-                # self.current_editor.document().setDefaultFont(font)
 
     def change_text_color(self):
         if self.current_editor:

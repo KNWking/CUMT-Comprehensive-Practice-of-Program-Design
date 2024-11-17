@@ -70,7 +70,7 @@ class PuzzleGame(QMainWindow):
         self.timeLeft = 0
         self.original_image_dialog = None
         self.challengeTime = 0
-        self.EASY_TIME = 30
+        self.EASY_TIME = 1
         self.MEDIUM_TIME = 90
         self.HARD_TIME = 360
         self.EASY_GRID_SIDE_NUMBER = 2
