@@ -70,12 +70,12 @@ class PuzzleGame(QMainWindow):
         self.timeLeft = 0
         self.original_image_dialog = None
         self.challengeTime = 0
-        self.EASY_TIME = 1
-        self.MEDIUM_TIME = 90
+        self.EASY_TIME = 10
+        self.MEDIUM_TIME = 180
         self.HARD_TIME = 360
         self.EASY_GRID_SIDE_NUMBER = 2
-        self.MEDIUM_GRID_SIDE_NUMBER = 3
-        self.HARD_GRID_SIDE_NUMBER = 4
+        self.MEDIUM_GRID_SIDE_NUMBER = 4
+        self.HARD_GRID_SIDE_NUMBER = 5
 
     def initUI(self):
         self.setWindowTitle('myPuzzle')
@@ -372,7 +372,7 @@ class PuzzleGame(QMainWindow):
                     self.timer.stop()
                     self.challengeButton.setEnabled(True)
                     self.stopChallengeButton.setEnabled(False)
-                    QMessageBox.information(self, '恭喜', f'拼图完成! 用时: {self.challengeTime - self.timeLeft} 秒')
+                    QMessageBox.information(self, '恭喜', f'挑战成功! 用时: {self.challengeTime - self.timeLeft} 秒')
                 else:
                     QMessageBox.information(self, '恭喜', '拼图完成!')
 
@@ -470,7 +470,7 @@ class PuzzleGame(QMainWindow):
             self.timer.stop()
             self.challengeButton.setEnabled(True)
             self.stopChallengeButton.setEnabled(False)
-            QMessageBox.information(self, '挑战失败', '时间到！')
+            QMessageBox.information(self, '挑战失败', '时间到！挑战失败！')
 
 
 if __name__ == '__main__':
