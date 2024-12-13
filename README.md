@@ -22,6 +22,39 @@ CUMT 程序设计综合实践课程 project 代码。包含以下三项 project�
 >
 >    使用 `PyQt6` 和 `QFluentWidgets`。附 [QFluentWidgets](https://qfluentwidgets.com/zh/) 官网。
 
-## TODO
 
-- [ ] 给出每个 project 的释义截图。
+
+## 程序页面设计预览
+
+**proj01-简单计算器：**
+
+
+
+![](./resource/proj01.png)
+
+
+
+**proj01-简单计算器拓展-贷款计算器：**
+
+![](./resource/proj01-extra.png)
+
+
+
+**proj02-拼图游戏：**
+
+
+
+![](./resource/proj02.png)
+
+
+
+> 内恰最可爱了！！！
+
+
+
+**proj03-多文档文本编辑器：**
+
+
+
+![](./resource/proj03.png)
+
