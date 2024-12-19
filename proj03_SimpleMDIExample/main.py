@@ -251,6 +251,10 @@ class CustomTitleBar(MSFluentTitleBar):
         underline_action.triggered.connect(parent.toggle_underline)
         decoration_menu.addAction(underline_action)
 
+        strikethrough_action = Action("删除线")
+        strikethrough_action.setShortcut("Alt+S")
+        strikethrough_action.triggered.connect(parent.toggle_strikethrough)
+        decoration_menu.addAction(strikethrough_action)
 
 
         theme_menu = RoundMenu("主题", self)
@@ -353,6 +357,9 @@ class Window(MSFluentWindow):
 
         underline_shortcut = QShortcut(QKeySequence("Ctrl+U"), self)
         underline_shortcut.activated.connect(self.toggle_underline)
+
+        strikethrough_shortcut = QShortcut(QKeySequence("Alt+S"), self)
+        strikethrough_shortcut.activated.connect(self.toggle_strikethrough)
 
         # Alt
         font_shortcut = QShortcut(QKeySequence("Alt+A"), self)
@@ -650,6 +657,14 @@ class Window(MSFluentWindow):
             cursor = self.current_editor.textCursor()
             format = QTextCharFormat()
             format.setFontUnderline(not cursor.charFormat().fontUnderline())
+            cursor.mergeCharFormat(format)
+            self.current_editor.setTextCursor(cursor)
+
+    def toggle_strikethrough(self):
+        if self.current_editor:
+            cursor = self.current_editor.textCursor()
+            format = QTextCharFormat()
+            format.setFontStrikeOut(not cursor.charFormat().fontStrikeOut())
             cursor.mergeCharFormat(format)
             self.current_editor.setTextCursor(cursor)
 
